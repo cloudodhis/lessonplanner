@@ -1,13 +1,14 @@
 {
   "name": "lesson-planner",
   "version": "1.0.0",
-  "description": "AI-powered lesson planner using Gemma via Google AI Studio",
+  "description": "AI-powered lesson planner using Claude, with Ollama and Google AI fallback",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@google/generative-ai": "^0.21.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2"

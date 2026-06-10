@@ -6,13 +6,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ── Provider detection ────────────────────────────────────────
+const ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || '';
 const GOOGLE_KEY  = process.env.GOOGLE_API_KEY || '';
 const OLLAMA_URL  = process.env.OLLAMA_URL || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma3:latest';
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
 const GOOGLE_MODEL = process.env.GOOGLE_MODEL || 'gemini-2.0-flash';
 
-// Auto-select provider: prefer Ollama if running, else Google API
-// Can be forced with AI_PROVIDER=google|ollama
+// Auto-select provider: prefer Ollama if running, else Claude, else Google
+// Can be forced with AI_PROVIDER=claude|google|ollama
 const FORCED_PROVIDER = process.env.AI_PROVIDER || 'auto';
 
 app.use(express.json());
@@ -20,14 +22,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Health check ─────────────────────────────────────────────
 app.get('/api/health', async (req, res) => {
-  // Try Ollama first (unless forced to google)
-  if (FORCED_PROVIDER !== 'google') {
+  // Try Ollama first (unless forced to a cloud provider)
+  if (FORCED_PROVIDER === 'auto' || FORCED_PROVIDER === 'ollama') {
     try {
       const r = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(2000) });
       if (r.ok) {
         const data = await r.json();
         const models = (data.models || []).map(m => m.name);
-        const hasModel = models.some(m => m.startsWith('gemma'));
+        const hasModel = models.some(m => m.startsWith('gemma') || m.startsWith('llama'));
         return res.json({
           status: 'ok',
           provider: 'ollama',
@@ -40,8 +42,18 @@ app.get('/api/health', async (req, res) => {
     } catch { /* Ollama not running */ }
   }
 
-  // Fall back to Google API
-  if (GOOGLE_KEY) {
+  // Claude is the primary cloud provider
+  if ((FORCED_PROVIDER === 'auto' || FORCED_PROVIDER === 'claude') && ANTHROPIC_KEY) {
+    return res.json({
+      status: 'ok',
+      provider: 'claude',
+      model: CLAUDE_MODEL,
+      label: `Claude · ${CLAUDE_MODEL}`
+    });
+  }
+
+  // Google API as secondary fallback
+  if ((FORCED_PROVIDER === 'auto' || FORCED_PROVIDER === 'google') && GOOGLE_KEY) {
     return res.json({
       status: 'ok',
       provider: 'google',
@@ -53,7 +65,7 @@ app.get('/api/health', async (req, res) => {
   // Nothing available
   res.status(503).json({
     status: 'error',
-    message: 'No AI available. Start Ollama locally or set GOOGLE_API_KEY in .env'
+    message: 'No AI available. Start Ollama locally or set ANTHROPIC_API_KEY / GOOGLE_API_KEY in .env'
   });
 });
 
@@ -66,21 +78,26 @@ app.post('/api/generate', async (req, res) => {
 
   const prompt = buildPrompt(req.body);
 
-  // Decide provider
-  let useOllama = FORCED_PROVIDER !== 'google';
-  if (useOllama) {
+  // Decide provider: Ollama (local) → Claude (primary cloud) → Google (fallback)
+  let provider = FORCED_PROVIDER;
+  if (provider === 'auto') {
+    let ollamaUp = false;
     try {
       const r = await fetch(`${OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(1500) });
-      useOllama = r.ok;
-    } catch { useOllama = false; }
+      ollamaUp = r.ok;
+    } catch { ollamaUp = false; }
+
+    provider = ollamaUp ? 'ollama' : (ANTHROPIC_KEY ? 'claude' : 'google');
   }
 
-  if (useOllama) {
+  if (provider === 'ollama') {
     await streamOllama(prompt, res);
-  } else if (GOOGLE_KEY) {
+  } else if (provider === 'claude' && ANTHROPIC_KEY) {
+    await streamClaude(prompt, res);
+  } else if (provider === 'google' && GOOGLE_KEY) {
     await streamGoogle(prompt, res);
   } else {
-    res.write(`data: ${JSON.stringify({ error: 'No AI provider available. Start Ollama or set GOOGLE_API_KEY.' })}\n\n`);
+    res.write(`data: ${JSON.stringify({ error: 'No AI provider available. Start Ollama or set ANTHROPIC_API_KEY / GOOGLE_API_KEY.' })}\n\n`);
     res.end();
   }
 });
@@ -116,6 +133,30 @@ async function streamOllama(prompt, res) {
         } catch { /* skip */ }
       }
     }
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+  }
+  res.end();
+}
+
+// ── Claude streaming (primary cloud provider) ─────────────────
+async function streamClaude(prompt, res) {
+  try {
+    const Anthropic = require('@anthropic-ai/sdk');
+    const anthropic = new Anthropic({ apiKey: ANTHROPIC_KEY });
+
+    const stream = anthropic.messages.stream({
+      model: CLAUDE_MODEL,
+      max_tokens: 4096,
+      messages: [{ role: 'user', content: prompt }]
+    });
+
+    stream.on('text', (text) => {
+      res.write(`data: ${JSON.stringify({ text })}\n\n`);
+    });
+
+    await stream.finalMessage();
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   } catch (err) {
     res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
   }
@@ -271,6 +312,7 @@ Make this immediately usable in a real classroom. Be detailed, specific, and pra
 app.listen(PORT, () => {
   console.log(`\n🎓 Lesson Planner running at http://localhost:${PORT}`);
   console.log(`   Ollama:  ${OLLAMA_URL} · model: ${OLLAMA_MODEL}`);
-  console.log(`   Google:  ${GOOGLE_KEY ? '✅ API key set' : '❌ No key (set GOOGLE_API_KEY in .env)'}`);
-  console.log(`   Provider: ${FORCED_PROVIDER === 'auto' ? 'auto (Ollama → Google fallback)' : FORCED_PROVIDER}\n`);
+  console.log(`   Claude:  ${ANTHROPIC_KEY ? `✅ API key set · model: ${CLAUDE_MODEL}` : '❌ No key (set ANTHROPIC_API_KEY in .env)'}`);
+  console.log(`   Google:  ${GOOGLE_KEY ? `✅ API key set · model: ${GOOGLE_MODEL}` : '❌ No key (set GOOGLE_API_KEY in .env)'}`);
+  console.log(`   Provider: ${FORCED_PROVIDER === 'auto' ? 'auto (Ollama → Claude → Google fallback)' : FORCED_PROVIDER}\n`);
 });

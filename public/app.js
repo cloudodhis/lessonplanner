@@ -203,7 +203,9 @@ async function checkHealth() {
     const res  = await fetch('/api/health');
     const data = await res.json();
     if (data.status === 'ok') {
-      const providerIcon = data.provider === 'ollama' ? '🦙' : '🤖';
+      const providerIcon = data.provider === 'ollama' ? '🦙'
+        : data.provider === 'claude' ? '✨'
+        : '🤖';
       setStatus('online', `${providerIcon} ${data.label}`);
     } else {
       setStatus('offline', 'No AI available');

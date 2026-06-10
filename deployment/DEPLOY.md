@@ -5,16 +5,16 @@ run on **Hostinger's Node.js hosting** (available on Premium/Business Shared
 Hosting and Cloud/VPS plans via hPanel).
 
 > ⚠️ Ollama (local AI) only runs on your own computer — it cannot run on
-> shared hosting. The deployed app uses the **Google AI Studio API**
-> (free tier available) instead. Generation will work the same way for
+> shared hosting. The deployed app uses the **Claude API (Anthropic)**
+> as its primary provider. Generation will work the same way for
 > your visitors, just powered by the cloud instead of your PC.
 
 ---
 
-## 1. Get a free Google AI API key
+## 1. Get a Claude (Anthropic) API key
 
-1. Go to https://aistudio.google.com/app/apikey
-2. Sign in with a Google account and click **Create API key**
+1. Go to https://console.anthropic.com
+2. Sign in, add billing details, and create an API key under **API Keys**
 3. Copy the key — you'll paste it in step 4 below
 
 ---
@@ -49,24 +49,24 @@ directly inside the application root.
 ## 4. Add your API key
 
 1. Rename `.env.example` to `.env`
-2. Edit `.env` and paste your Google AI API key:
+2. Edit `.env` and paste your Claude API key:
    ```
-   GOOGLE_API_KEY=your_actual_key_here
-   AI_PROVIDER=google
+   ANTHROPIC_API_KEY=your_actual_key_here
+   AI_PROVIDER=claude
    ```
    (You can edit this directly in hPanel's File Manager — click the file,
    then **Edit**.)
 
 Alternatively, in the Node.js app screen in hPanel there's an
-**Environment Variables** section — you can add `GOOGLE_API_KEY`,
-`GOOGLE_MODEL`, and `AI_PROVIDER` there instead of using a `.env` file.
+**Environment Variables** section — you can add `ANTHROPIC_API_KEY`,
+`CLAUDE_MODEL`, and `AI_PROVIDER` there instead of using a `.env` file.
 
 ---
 
 ## 5. Install dependencies
 
 Back in hPanel's Node.js app screen, click **Run NPM Install** (this reads
-`package.json` and installs `express`, `dotenv`, and
+`package.json` and installs `express`, `dotenv`, `@anthropic-ai/sdk`, and
 `@google/generative-ai`).
 
 ---
@@ -81,7 +81,7 @@ Click **Restart** in the Node.js app screen. hPanel will start
 ## 7. Test it
 
 Visit your domain. The status badge in the header should show
-**🤖 Google AI · gemini-2.0-flash**. Pick a template, fill in the form, and
+**✨ Claude · claude-sonnet-4-6**. Pick a template, fill in the form, and
 click **Generate Plan** — you should see the lesson plan stream in.
 
 ---
@@ -90,7 +90,16 @@ click **Generate Plan** — you should see the lesson plan stream in.
 
 | Problem | Fix |
 |---|---|
-| Status badge says "No AI available" | Check `.env` has `GOOGLE_API_KEY` set and the app was restarted after editing it |
-| "model ... is not found ... or is not supported for generateContent" | The `GOOGLE_MODEL` value isn't available for your key. Set `GOOGLE_MODEL=gemini-2.0-flash` (or `gemini-1.5-flash`) and restart |
+| Status badge says "No AI available" | Check `.env` has `ANTHROPIC_API_KEY` set and the app was restarted after editing it |
+| "authentication_error" / 401 | Your `ANTHROPIC_API_KEY` is missing, wrong, or billing isn't set up on console.anthropic.com |
+| "model: not_found_error" | The `CLAUDE_MODEL` value isn't available for your account. Try `claude-sonnet-4-6` or `claude-haiku-4-5-20251001` |
 | Page shows old content after re-uploading | Hard refresh the browser (Ctrl+Shift+R) — static files may be cached |
 | 503 / app won't start | Confirm `server.js` is set as the startup file and `npm install` completed without errors |
+
+---
+
+## Optional: fall back to Google AI Studio
+
+If you'd rather not use Claude, set `AI_PROVIDER=google` and
+`GOOGLE_API_KEY` (free tier at https://aistudio.google.com/app/apikey)
+instead — the app supports both.
