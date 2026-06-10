@@ -81,7 +81,7 @@ Click **Restart** in the Node.js app screen. hPanel will start
 ## 7. Test it
 
 Visit your domain. The status badge in the header should show
-**🤖 Google AI · gemma-3-27b-it**. Pick a template, fill in the form, and
+**🤖 Google AI · gemini-2.0-flash**. Pick a template, fill in the form, and
 click **Generate Plan** — you should see the lesson plan stream in.
 
 ---
@@ -91,6 +91,6 @@ click **Generate Plan** — you should see the lesson plan stream in.
 | Problem | Fix |
 |---|---|
 | Status badge says "No AI available" | Check `.env` has `GOOGLE_API_KEY` set and the app was restarted after editing it |
-| "model not found" error when generating | Try a different `GOOGLE_MODEL` value, e.g. `gemma-3-12b-it` or `gemini-2.0-flash` |
+| "model ... is not found ... or is not supported for generateContent" | The `GOOGLE_MODEL` value isn't available for your key. Set `GOOGLE_MODEL=gemini-2.0-flash` (or `gemini-1.5-flash`) and restart |
 | Page shows old content after re-uploading | Hard refresh the browser (Ctrl+Shift+R) — static files may be cached |
 | 503 / app won't start | Confirm `server.js` is set as the startup file and `npm install` completed without errors |

@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 const GOOGLE_KEY  = process.env.GOOGLE_API_KEY || '';
 const OLLAMA_URL  = process.env.OLLAMA_URL || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'gemma3:latest';
-const GOOGLE_MODEL = process.env.GOOGLE_MODEL || 'gemma-3-27b-it';
+const GOOGLE_MODEL = process.env.GOOGLE_MODEL || 'gemini-2.0-flash';
 
 // Auto-select provider: prefer Ollama if running, else Google API
 // Can be forced with AI_PROVIDER=google|ollama
