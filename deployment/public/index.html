@@ -955,6 +955,15 @@
             <div class="out-actions">
               <button id="copy-btn" class="btn-tool">📋 Copy</button>
               <button id="print-btn" class="btn-tool">🖨️ Print</button>
+              <div class="dropdown" id="download-dropdown">
+                <button id="download-btn" class="btn-tool">⬇️ Download</button>
+                <div class="dropdown-menu hidden" id="download-menu">
+                  <button class="dropdown-item" data-format="md">📝 Markdown (.md)</button>
+                  <button class="dropdown-item" data-format="txt">📄 Plain Text (.txt)</button>
+                  <button class="dropdown-item" data-format="doc">📃 Word (.doc)</button>
+                  <button class="dropdown-item" data-format="pdf">🧾 PDF</button>
+                </div>
+              </div>
             </div>
           </div>
           <div id="lesson-output" class="lesson-output"></div>

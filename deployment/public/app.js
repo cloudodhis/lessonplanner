@@ -38,6 +38,8 @@ const lessonOutput  = document.getElementById('lesson-output');
 const errorMsg      = document.getElementById('error-message');
 const copyBtn       = document.getElementById('copy-btn');
 const printBtn      = document.getElementById('print-btn');
+const downloadBtn   = document.getElementById('download-btn');
+const downloadMenu  = document.getElementById('download-menu');
 const retryBtn      = document.getElementById('retry-btn');
 
 /* ── State ──────────────────────────────────────────────────── */
@@ -384,6 +386,66 @@ copyBtn.addEventListener('click', async () => {
 });
 
 printBtn.addEventListener('click', () => window.print());
+
+downloadBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  downloadMenu.classList.toggle('hidden');
+});
+
+downloadMenu.addEventListener('click', e => e.stopPropagation());
+
+document.addEventListener('click', () => downloadMenu.classList.add('hidden'));
+
+downloadMenu.querySelectorAll('.dropdown-item').forEach(item => {
+  item.addEventListener('click', () => {
+    downloadMenu.classList.add('hidden');
+    downloadAs(item.dataset.format);
+  });
+});
+
+function getFileName() {
+  const title = (outTitle.textContent || 'lesson-plan')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return title || 'lesson-plan';
+}
+
+function downloadAs(format) {
+  const name = getFileName();
+
+  if (format === 'pdf') {
+    window.print();
+    return;
+  }
+
+  let content, mime, ext;
+  if (format === 'md') {
+    content = rawMarkdown;
+    mime    = 'text/markdown';
+    ext     = 'md';
+  } else if (format === 'txt') {
+    content = lessonOutput.innerText;
+    mime    = 'text/plain';
+    ext     = 'txt';
+  } else if (format === 'doc') {
+    content = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${name}</title></head><body>${lessonOutput.innerHTML}</body></html>`;
+    mime    = 'application/msword';
+    ext     = 'doc';
+  } else {
+    return;
+  }
+
+  const blob = new Blob([content], { type: mime });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `${name}.${ext}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 retryBtn.addEventListener('click', () => { checkHealth(); showOutput('empty'); });
 

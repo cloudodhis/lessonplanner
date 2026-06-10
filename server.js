@@ -211,41 +211,58 @@ function buildPrompt(data) {
 
 ---
 
+FORMATTING RULES (follow strictly):
+- Do NOT use emojis or decorative icons anywhere in the document — not in headings, not in body text.
+- Use plain, professional section headings (e.g. "## Lesson Overview", not "## 📚 Lesson Overview").
+- Wherever the content is a list of structured items (objectives, materials, schedules, tasks, criteria), present it as a Markdown table with clear column headers, like a formal register or planning document — not a bulleted list with emojis.
+- Keep prose sections concise and businesslike.
+
 ${planType === 'assessment' ? `
-## 📋 Assessment Overview
+## Assessment Overview
 Brief description of what this assessment covers and its purpose.
 
-## 🎯 Assessment Objectives
-What students are expected to demonstrate, linked to the learning objectives above.
+## Assessment Objectives
+| # | Objective | Linked Learning Outcome |
+|---|-----------|--------------------------|
+| 1 | ... | ... |
+| 2 | ... | ... |
 
-## 📐 Assessment Methods
-- **Formative** (ongoing checks): ...
-- **Summative** (final evaluation): ...
+## Assessment Methods
+| Method | Type (Formative/Summative) | Purpose |
+|--------|------------------------------|---------|
+| ... | ... | ... |
 
-## 📝 Assessment Tasks
-Describe each task/question type with clear instructions.
+## Assessment Tasks
+| Task # | Description | Format | Marks |
+|--------|-------------|--------|-------|
+| 1 | ... | ... | ... |
 
-## 📊 Marking Rubric
+## Marking Rubric
 | Criterion | Excellent (4) | Proficient (3) | Developing (2) | Beginning (1) |
 |-----------|--------------|----------------|----------------|---------------|
 | ...       | ...          | ...            | ...            | ...           |
 
-## 🌈 Accommodations
+## Accommodations
 How to modify the assessment for diverse learners.
 
-## 💡 Feedback Strategies
+## Feedback Strategies
 How to deliver meaningful feedback to students after assessment.
 ` : planType === 'unit' ? `
-## 📚 Unit Overview
+## Unit Overview
 A 2–3 sentence summary of the unit, its purpose, and how it fits into the broader curriculum.
 
-## 🎯 Unit Learning Objectives
-5–7 overarching objectives for the entire unit.
+## Unit Learning Objectives
+| # | Objective |
+|---|-----------|
+| 1 | ... |
+| 2 | ... |
 
-## 📦 Required Resources
-Materials, tools, and references needed across the unit.
+## Required Resources
+| Resource | Type | Purpose |
+|----------|------|---------|
+| ... | ... | ... |
 
-## 🗓️ Weekly Session Plan
+## Weekly Session Plan
 | Week | Topic | Key Activities | Assessment |
 |------|-------|----------------|------------|
 | 1    | ...   | ...            | ...        |
@@ -253,56 +270,74 @@ Materials, tools, and references needed across the unit.
 | 3    | ...   | ...            | ...        |
 | 4    | ...   | ...            | ...        |
 
-## 📈 Skill Progression
+## Skill Progression
 How skills and knowledge build week by week.
 
-## 📊 Assessment Plan
+## Assessment Plan
 Formative checks and summative tasks across the unit.
 
-## 🌈 Differentiation Strategies
-How to support advanced, struggling, and ELL learners across the unit.
+## Differentiation Strategies
+| Learner Group | Strategy |
+|----------------|----------|
+| Advanced learners | ... |
+| Struggling learners | ... |
+| ELL / ESL students | ... |
 
-## 💡 Teacher Notes
+## Teacher Notes
 Pacing tips, common pitfalls, and reflection prompts.
 ` : `
-## 📚 Lesson Overview
+## Lesson Overview
 A concise 2–3 sentence summary of the lesson.
 
-## 🎯 Learning Objectives
-3–5 measurable objectives using Bloom's Taxonomy verbs.
+## Learning Objectives
+| # | Objective | Bloom's Level |
+|---|-----------|----------------|
+| 1 | ... | ... |
+| 2 | ... | ... |
 
-## 📦 Required Materials & Resources
-Bulleted list of everything needed.
+## Required Materials & Resources
+| # | Item | Notes |
+|---|------|-------|
+| 1 | ... | ... |
 
-## ⏱️ Lesson Structure
+## Lesson Structure
+| Phase | Duration | Description |
+|-------|----------|--------------|
+| Warm-Up / Hook | ${warmup} min | ... |
+| Direct Instruction | ${instruction} min | ... |
+| Guided Practice | ${guided} min | ... |
+| Independent Practice | ${independent} min | ... |
+| Assessment & Wrap-Up | ${wrapup} min | ... |
 
-### 🔥 Warm-Up / Hook (${warmup} min)
+### Warm-Up / Hook (${warmup} min)
 An engaging opener to activate prior knowledge.
 
-### 📖 Direct Instruction (${instruction} min)
+### Direct Instruction (${instruction} min)
 Key concepts, explanations, examples, and analogies.
 
-### 🤝 Guided Practice (${guided} min)
+### Guided Practice (${guided} min)
 Teacher and students work through examples together.
 
-### ✏️ Independent Practice (${independent} min)
+### Independent Practice (${independent} min)
 Student task to apply learning independently.
 
-### 🏁 Assessment & Wrap-Up (${wrapup} min)
+### Assessment & Wrap-Up (${wrapup} min)
 Exit ticket or formative check plus closing reflection.
 
-## 🌈 Differentiation Strategies
-- **Advanced learners:** ...
-- **Struggling learners:** ...
-- **ELL / ESL students:** ...
+## Differentiation Strategies
+| Learner Group | Strategy |
+|----------------|----------|
+| Advanced learners | ... |
+| Struggling learners | ... |
+| ELL / ESL students | ... |
 
-## 📊 Assessment Methods
+## Assessment Methods
 Formative and summative approaches.
 
-## 🏠 Homework / Extension Activities
+## Homework / Extension Activities
 1–3 optional follow-up tasks.
 
-## 💡 Teacher Notes & Tips
+## Teacher Notes & Tips
 Misconceptions to watch for, pacing advice, reflection prompts.
 `}
 

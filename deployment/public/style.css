@@ -487,6 +487,44 @@ textarea { resize: vertical; min-height: 64px; }
 
 .btn-tool:hover { background: var(--bg-subtle); border-color: var(--border-hover); color: var(--text); }
 
+/* Download dropdown */
+.dropdown { position: relative; }
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  min-width: 175px;
+  padding: 6px;
+  z-index: 20;
+}
+
+.dropdown-menu.hidden { display: none; }
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition);
+}
+
+.dropdown-item:hover { background: var(--bg-subtle); }
+
 /* ── Markdown output ─────────────────────────────────────────── */
 .lesson-output {
   padding: 32px 40px 60px;
@@ -506,6 +544,11 @@ textarea { resize: vertical; min-height: 64px; }
 .lesson-output hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 .lesson-output code { background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 4px; font-size: .8rem; padding: 1px 5px; color: var(--accent); font-family: monospace; }
 .lesson-output blockquote { border-left: 3px solid var(--accent); padding: 8px 14px; margin: 10px 0; background: var(--accent-light); border-radius: 0 6px 6px 0; color: #0f766e; font-size: .875rem; }
+
+.lesson-output table { width: 100%; border-collapse: collapse; margin: 10px 0 18px; font-size: .85rem; }
+.lesson-output th, .lesson-output td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+.lesson-output thead th { background: var(--header-bg); color: #fff; font-weight: 600; }
+.lesson-output tbody tr:nth-child(even) { background: var(--bg-subtle); }
 
 .lesson-output .cursor {
   display: inline-block; width: 2px; height: 1em;
