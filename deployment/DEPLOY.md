@@ -92,7 +92,7 @@ click **Generate Plan** — you should see the lesson plan stream in.
 |---|---|
 | Status badge says "No AI available" | Check `.env` has `ANTHROPIC_API_KEY` set and the app was restarted after editing it |
 | "authentication_error" / 401 | Your `ANTHROPIC_API_KEY` is missing, wrong, or billing isn't set up on console.anthropic.com |
-| "model: not_found_error" | The `CLAUDE_MODEL` value isn't available for your account. Try `claude-sonnet-4-6` or `claude-haiku-4-5-20251001` |
+| "model: not_found_error" | The `CLAUDE_MODEL` value isn't available for your account. Try `claude-sonnet-4-6` or `claude-haiku-4-5` |
 | Page shows old content after re-uploading | Hard refresh the browser (Ctrl+Shift+R) — static files may be cached |
 | 503 / app won't start | Confirm `server.js` is set as the startup file and `npm install` completed without errors |
 

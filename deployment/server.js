@@ -147,7 +147,7 @@ async function streamClaude(prompt, res) {
 
     const stream = anthropic.messages.stream({
       model: CLAUDE_MODEL,
-      max_tokens: 4096,
+      max_tokens: 8192,
       messages: [{ role: 'user', content: prompt }]
     });
 
