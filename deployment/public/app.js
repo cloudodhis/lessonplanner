@@ -198,6 +198,167 @@ function resetMs() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   SEARCHABLE SELECT COMPONENT
+   Wraps every <select> in the form with a searchable dropdown panel,
+   while keeping the underlying <select> as the source of truth so
+   form.<name>.value continues to work unchanged.
+   ════════════════════════════════════════════════════════════ */
+function enhanceSelect(select) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'ssel-wrapper';
+  select.parentNode.insertBefore(wrapper, select);
+  wrapper.appendChild(select);
+
+  const control = document.createElement('div');
+  control.className = 'ssel-control';
+  control.tabIndex = 0;
+  control.setAttribute('role', 'button');
+  control.setAttribute('aria-haspopup', 'listbox');
+
+  const valueSpan = document.createElement('span');
+  valueSpan.className = 'ssel-value';
+
+  control.innerHTML = '<svg class="ms-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+  control.prepend(valueSpan);
+
+  const panel = document.createElement('div');
+  panel.className = 'ms-panel hidden';
+
+  const searchWrap = document.createElement('div');
+  searchWrap.className = 'ms-search-wrap';
+  searchWrap.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+
+  const searchInput = document.createElement('input');
+  searchInput.className = 'ms-search';
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Search…';
+  searchInput.autocomplete = 'off';
+  searchWrap.appendChild(searchInput);
+
+  const list = document.createElement('div');
+  list.className = 'ms-list';
+
+  panel.appendChild(searchWrap);
+  panel.appendChild(list);
+
+  wrapper.appendChild(control);
+  wrapper.appendChild(panel);
+
+  select._sselControl = control;
+
+  function addItem(opt) {
+    const item = document.createElement('div');
+    item.className = 'ms-item';
+    item.textContent = opt.textContent;
+    item.dataset.value = opt.value;
+    item.addEventListener('click', () => {
+      select.value = opt.value;
+      updateDisplay();
+      control.classList.remove('invalid');
+      closePanel();
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    list.appendChild(item);
+  }
+
+  function buildItems() {
+    list.innerHTML = '';
+    [...select.children].forEach(child => {
+      if (child.tagName === 'OPTGROUP') {
+        const head = document.createElement('div');
+        head.className = 'ms-group-head';
+        head.textContent = child.label;
+        list.appendChild(head);
+        [...child.children].forEach(addItem);
+      } else if (child.tagName === 'OPTION') {
+        addItem(child);
+      }
+    });
+  }
+
+  function updateDisplay() {
+    const opt = select.options[select.selectedIndex];
+    valueSpan.textContent = opt ? opt.textContent : '';
+    valueSpan.classList.toggle('placeholder', !!opt && opt.value === '');
+    list.querySelectorAll('.ms-item').forEach(i => {
+      i.classList.toggle('selected', i.dataset.value === select.value);
+    });
+  }
+
+  function filterItems(q) {
+    q = q.trim().toLowerCase();
+    const items = list.querySelectorAll('.ms-item');
+    const heads = list.querySelectorAll('.ms-group-head');
+    let any = false;
+
+    items.forEach(item => {
+      const show = !q || item.textContent.toLowerCase().includes(q);
+      item.classList.toggle('hidden-item', !show);
+      if (show) any = true;
+    });
+
+    heads.forEach(head => {
+      let next = head.nextElementSibling;
+      let allHidden = true;
+      while (next && !next.classList.contains('ms-group-head')) {
+        if (!next.classList.contains('hidden-item')) { allHidden = false; break; }
+        next = next.nextElementSibling;
+      }
+      head.classList.toggle('hidden-item', allHidden);
+    });
+
+    let noRes = list.querySelector('.ms-no-results');
+    if (!any && q) {
+      if (!noRes) {
+        noRes = document.createElement('div');
+        noRes.className = 'ms-no-results';
+        list.appendChild(noRes);
+      }
+      noRes.textContent = `No matches for "${q}"`;
+      noRes.style.display = '';
+    } else if (noRes) {
+      noRes.style.display = 'none';
+    }
+  }
+
+  function openPanel() {
+    panel.classList.remove('hidden');
+    control.classList.add('open');
+    searchInput.value = '';
+    filterItems('');
+    searchInput.focus();
+    const sel = list.querySelector('.ms-item.selected');
+    if (sel) sel.scrollIntoView({ block: 'nearest' });
+  }
+
+  function closePanel() {
+    panel.classList.add('hidden');
+    control.classList.remove('open');
+  }
+
+  control.addEventListener('click', () => {
+    panel.classList.contains('hidden') ? openPanel() : closePanel();
+  });
+
+  control.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); panel.classList.contains('hidden') ? openPanel() : closePanel(); }
+    if (e.key === 'Escape') closePanel();
+  });
+
+  searchInput.addEventListener('input', e => filterItems(e.target.value));
+  panel.addEventListener('click', e => e.stopPropagation());
+
+  document.addEventListener('click', e => {
+    if (!wrapper.contains(e.target)) closePanel();
+  });
+
+  buildItems();
+  updateDisplay();
+}
+
+document.querySelectorAll('#lesson-form select').forEach(enhanceSelect);
+
+/* ═══════════════════════════════════════════════════════════════
    HEALTH CHECK
    ════════════════════════════════════════════════════════════ */
 async function checkHealth() {
@@ -278,8 +439,8 @@ form.addEventListener('submit', async e => {
   const gradeLevel = form.gradeLevel.value;
   let valid = true;
 
-  if (!subject)    { document.getElementById('subject').style.borderColor = '#ef4444'; valid = false; }
-  if (!gradeLevel) { document.getElementById('gradeLevel').style.borderColor = '#ef4444'; valid = false; }
+  if (!subject)    { form.subject._sselControl.classList.add('invalid'); valid = false; }
+  if (!gradeLevel) { form.gradeLevel._sselControl.classList.add('invalid'); valid = false; }
   if (!objectives) { msControl.classList.add('invalid'); valid = false; }
 
   if (!valid) return;
@@ -306,13 +467,6 @@ form.addEventListener('submit', async e => {
     theoryHours:     form.theoryHours.value.trim(),
     practicalHours:  form.practicalHours.value.trim(),
     attachmentHours: form.attachmentHours.value.trim()
-  });
-});
-
-// Clear red borders on change
-['subject', 'gradeLevel'].forEach(id => {
-  document.getElementById(id)?.addEventListener('change', e => {
-    e.target.style.borderColor = '';
   });
 });
 

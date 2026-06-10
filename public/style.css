@@ -772,6 +772,9 @@ textarea { resize: vertical; min-height: 64px; }
   align-items: center;
   gap: 9px;
   padding: 7px 12px;
+  font-size: .8rem;
+  color: var(--text);
+  line-height: 1.4;
   cursor: pointer;
   transition: background var(--transition);
 }
@@ -805,6 +808,54 @@ textarea { resize: vertical; min-height: 64px; }
   font-size: .8rem;
   color: var(--text-light);
 }
+
+.ms-item.selected { background: var(--accent-light); font-weight: 600; }
+
+/* ── Searchable select component ───────────────────────────────
+   Wraps native <select> elements; the <select> stays in the DOM
+   (hidden) as the source of truth, this is the visible control. */
+.ssel-wrapper { position: relative; }
+
+.ssel-wrapper > select { display: none; }
+
+.ssel-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 10px;
+  cursor: pointer;
+  min-height: 36px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  user-select: none;
+}
+
+.ssel-control:focus,
+.ssel-control.open {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(13,148,136,.1);
+  outline: none;
+}
+
+.ssel-control.invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+}
+
+.ssel-value {
+  flex: 1;
+  font-size: .875rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ssel-value.placeholder { color: var(--text-light); }
+
+.ssel-control.open .ms-chevron { transform: rotate(180deg); }
 
 /* ── Utilities ───────────────────────────────────────────────── */
 .hidden { display: none !important; }

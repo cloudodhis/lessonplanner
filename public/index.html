@@ -120,7 +120,7 @@
           <p id="plan-subtitle" class="plan-subtitle"></p>
         </div>
 
-        <form id="lesson-form">
+        <form id="lesson-form" novalidate>
 
           <!-- Institution & Trainer details (TVET / CDACC document header) -->
           <details class="field-group" open>
@@ -133,7 +133,36 @@
               </div>
               <div class="field">
                 <label for="department">Department</label>
-                <input type="text" id="department" name="department" placeholder="e.g. Automotive &amp; Mechanical Engineering" />
+                <select id="department" name="department">
+                  <option value="">Select department…</option>
+                  <optgroup label="General / Academic">
+                    <option>Languages Department</option>
+                    <option>Mathematics Department</option>
+                    <option>Sciences Department</option>
+                    <option>Humanities &amp; Social Studies Department</option>
+                    <option>Creative &amp; Performing Arts Department</option>
+                    <option>Physical Education Department</option>
+                    <option>ICT Department</option>
+                    <option>Business Studies Department</option>
+                    <option>Special Needs Education Department</option>
+                  </optgroup>
+                  <optgroup label="TVET / Technical">
+                    <option>Agriculture, Food &amp; Natural Resources</option>
+                    <option>Building &amp; Civil Engineering</option>
+                    <option>Electrical &amp; Electronic Engineering</option>
+                    <option>Mechanical &amp; Automotive Engineering</option>
+                    <option>Information Communication Technology</option>
+                    <option>Hospitality &amp; Tourism Management</option>
+                    <option>Fashion Design &amp; Textile Technology</option>
+                    <option>Hairdressing &amp; Beauty Therapy</option>
+                    <option>Business &amp; Entrepreneurship Studies</option>
+                    <option>Applied Sciences</option>
+                    <option>Media Technology &amp; Design</option>
+                    <option>Maritime &amp; Fisheries Technology</option>
+                    <option>Mining &amp; Mineral Processing</option>
+                    <option>Liberal Studies / Communication Skills</option>
+                  </optgroup>
+                </select>
               </div>
             </div>
 
