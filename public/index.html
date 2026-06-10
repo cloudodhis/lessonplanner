@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Lesson Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        AI Lesson Planner
+      </div>
+      <div id="status-badge" class="status-badge checking">
+        <span class="status-dot"></span>
+        <span class="status-text">Checking AI…</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── PAGE: HOME ─────────────────────────────────────────── -->
+  <div id="page-home">
+
+    <section class="hero">
+      <h1>AI-Powered Teaching Documents</h1>
+      <p>Generate standardized, professional lesson plans aligned with your curriculum requirements.<br>
+        <span class="hero-cta">Select a template to begin.</span>
+      </p>
+    </section>
+
+    <section class="cards-section">
+      <div class="cards-grid">
+
+        <!-- Lesson Plan -->
+        <div class="card" data-type="lesson">
+          <div class="card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="13" y2="18"/></svg>
+          </div>
+          <h2>Lesson Plan</h2>
+          <p class="card-desc">Comprehensive breakdown of a single teaching session with timed structure.</p>
+          <ul class="card-features">
+            <li>Timed delivery blocks (warm-up → wrap-up)</li>
+            <li>Bloom's Taxonomy learning objectives</li>
+            <li>Differentiation &amp; assessment strategies</li>
+          </ul>
+          <button class="btn-card">Create Lesson Plan <span>→</span></button>
+        </div>
+
+        <!-- Unit Plan -->
+        <div class="card" data-type="unit">
+          <div class="card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+          </div>
+          <h2>Unit Plan</h2>
+          <p class="card-desc">Multi-lesson unit overview with learning progressions and weekly sessions.</p>
+          <ul class="card-features">
+            <li>Weekly session breakdown</li>
+            <li>Progressive skill-building sequence</li>
+            <li>Summative assessment &amp; pacing guide</li>
+          </ul>
+          <button class="btn-card">Create Unit Plan <span>→</span></button>
+        </div>
+
+        <!-- Assessment Plan -->
+        <div class="card" data-type="assessment">
+          <div class="card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          </div>
+          <h2>Assessment Plan</h2>
+          <p class="card-desc">Formative and summative evaluation tools with marking guides.</p>
+          <ul class="card-features">
+            <li>Rubrics and marking criteria</li>
+            <li>Formative check-in strategies</li>
+            <li>Student feedback templates</li>
+          </ul>
+          <button class="btn-card">Create Assessment Plan <span>→</span></button>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="levels-section">
+      <h3>Supported Levels</h3>
+      <div class="levels-list">
+        <span class="level-badge">Primary (Gr 1–6)</span>
+        <span class="level-badge">Secondary (Gr 7–12)</span>
+        <span class="level-badge">College / University</span>
+        <span class="level-badge">TVET / Vocational</span>
+        <span class="level-badge">Adult Learning</span>
+      </div>
+    </section>
+
+  </div><!-- /page-home -->
+
+
+  <!-- ── PAGE: WORKSPACE ───────────────────────────────────── -->
+  <div id="page-workspace" class="hidden">
+
+    <div class="workspace">
+
+      <!-- Left: Form panel -->
+      <aside class="form-panel">
+        <button id="back-btn" class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Templates
+        </button>
+
+        <div class="plan-header">
+          <span id="plan-badge" class="plan-badge"></span>
+          <h2 id="plan-title" class="plan-title"></h2>
+          <p id="plan-subtitle" class="plan-subtitle"></p>
+        </div>
+
+        <form id="lesson-form">
+
+          <!-- Subject dropdown -->
+          <div class="field">
+            <label for="subject">Subject <span class="req">*</span></label>
+            <select id="subject" name="subject" required>
+              <option value="">Select a subject…</option>
+
+              <optgroup label="── Languages &amp; Literacy">
+                <option>English Language Arts</option>
+                <option>Reading &amp; Literacy</option>
+                <option>Writing &amp; Composition</option>
+                <option>Grammar &amp; Vocabulary</option>
+                <option>English Literature</option>
+                <option>World Literature &amp; Classics</option>
+                <option>ESL / ELL (English Language Learners)</option>
+                <option>French</option>
+                <option>Spanish</option>
+                <option>Portuguese</option>
+                <option>Swahili</option>
+                <option>Arabic</option>
+                <option>Chinese (Mandarin)</option>
+                <option>German</option>
+                <option>Sign Language / ASL</option>
+              </optgroup>
+
+              <optgroup label="── Mathematics">
+                <option>Basic Mathematics</option>
+                <option>Number Sense &amp; Operations</option>
+                <option>Fractions, Decimals &amp; Percentages</option>
+                <option>Algebra I</option>
+                <option>Algebra II</option>
+                <option>Geometry</option>
+                <option>Trigonometry</option>
+                <option>Pre-Calculus</option>
+                <option>Calculus</option>
+                <option>Statistics &amp; Probability</option>
+                <option>Linear Algebra</option>
+                <option>Applied Mathematics</option>
+                <option>Financial Mathematics</option>
+              </optgroup>
+
+              <optgroup label="── Sciences">
+                <option>General Science</option>
+                <option>Biology</option>
+                <option>Chemistry</option>
+                <option>Physics</option>
+                <option>Earth Science</option>
+                <option>Environmental Science</option>
+                <option>Anatomy &amp; Physiology</option>
+                <option>Microbiology</option>
+                <option>Ecology</option>
+                <option>Astronomy</option>
+                <option>Organic Chemistry</option>
+              </optgroup>
+
+              <optgroup label="── Social Studies &amp; Humanities">
+                <option>Social Studies (General)</option>
+                <option>World History</option>
+                <option>Local / National History</option>
+                <option>Geography</option>
+                <option>Civics &amp; Government</option>
+                <option>Economics</option>
+                <option>Political Science</option>
+                <option>Sociology</option>
+                <option>Psychology</option>
+                <option>Philosophy</option>
+                <option>Anthropology</option>
+                <option>Current Events</option>
+              </optgroup>
+
+              <optgroup label="── Arts &amp; Creative">
+                <option>Visual Arts / Fine Art</option>
+                <option>Music Theory</option>
+                <option>Vocal Music</option>
+                <option>Instrumental Music</option>
+                <option>Drama &amp; Theatre</option>
+                <option>Dance</option>
+                <option>Film &amp; Media Studies</option>
+                <option>Photography</option>
+                <option>Graphic Design</option>
+                <option>Creative Writing</option>
+              </optgroup>
+
+              <optgroup label="── Physical Education &amp; Health">
+                <option>Physical Education</option>
+                <option>Health Education</option>
+                <option>Nutrition &amp; Wellness</option>
+                <option>First Aid &amp; Safety</option>
+                <option>Sports &amp; Athletics</option>
+              </optgroup>
+
+              <optgroup label="── Technology &amp; Computing">
+                <option>Computer Science</option>
+                <option>Programming / Coding</option>
+                <option>ICT / Digital Literacy</option>
+                <option>Web Development</option>
+                <option>Data Science</option>
+                <option>Cybersecurity</option>
+                <option>Robotics &amp; Automation</option>
+                <option>Artificial Intelligence</option>
+              </optgroup>
+
+              <optgroup label="── Business &amp; Commerce">
+                <option>Business Studies</option>
+                <option>Accounting &amp; Bookkeeping</option>
+                <option>Marketing</option>
+                <option>Entrepreneurship</option>
+                <option>Finance &amp; Investment</option>
+                <option>Business Administration</option>
+                <option>Office Administration</option>
+              </optgroup>
+
+              <optgroup label="── TVET: Pre-Vocational (NVCET)">
+                <option>Agri-Business</option>
+                <option>Appropriate Carpentry and Joinery</option>
+                <option>Building Technology</option>
+                <option>Electrical and Electronics Technology</option>
+                <option>Fashion Design and Garment Making</option>
+                <option>Food Processing Technology</option>
+                <option>Hairdressing and Beauty Therapy</option>
+                <option>Information Communication Technology</option>
+                <option>Metal Processing Technology</option>
+                <option>Motor Vehicle Technology</option>
+                <option>Refrigeration and Air Conditioning Technology</option>
+                <option>Seafarers</option>
+                <option>Tannery And Leatherwork Technology</option>
+              </optgroup>
+              <optgroup label="── TVET: Level 3 (Artisan)">
+                <option>Agricultural Mechanics</option>
+                <option>Agripreneurship</option>
+                <option>Aquaculture Technology</option>
+                <option>Arc Welding</option>
+                <option>Autoglazing</option>
+                <option>Baking</option>
+                <option>Barista</option>
+                <option>Barrister</option>
+                <option>Beauty Therapy</option>
+                <option>Carpentry</option>
+                <option>Ceramics artisan</option>
+                <option>Chemical Production Technology</option>
+                <option>Clerk-Typist</option>
+                <option>Computer applications</option>
+                <option>Cooking</option>
+                <option>Cosmetology</option>
+                <option>Dairy Farm Management</option>
+                <option>Detergent Production</option>
+                <option>Distribution sales</option>
+                <option>Electrical Installation</option>
+                <option>Electrical Machine Winding</option>
+                <option>Electrical Wiring</option>
+                <option>Electronics</option>
+                <option>Fashion Design</option>
+                <option>Fire Fighting Technology</option>
+                <option>Fire Management - Pump Operations</option>
+                <option>Fisheries Technology</option>
+                <option>Fisheries Technology - Dry Dock Operations</option>
+                <option>Fisheries Technology - Fishing Operations</option>
+                <option>Food and Beverage</option>
+                <option>Food and Beverage (Cookery)</option>
+                <option>Food and Beverage Production</option>
+                <option>Food and Beverage Sales</option>
+                <option>Food and Beverage Service (Waiter)</option>
+                <option>Footwear making</option>
+                <option>Forex and Securities</option>
+                <option>Front Office</option>
+                <option>Garment Making (Men's Wear)</option>
+                <option>Garment Making (Women's Wear)</option>
+                <option>Gas Welding</option>
+                <option>Gemology</option>
+                <option>General Agriculture</option>
+                <option>General Fitter</option>
+                <option>Gents Wear Outfits</option>
+                <option>Glass and Reflective Components Fitter</option>
+                <option>Gypsum Fixing</option>
+                <option>Gypsum Installation</option>
+                <option>Hair Dressing</option>
+                <option>Hairdressing</option>
+                <option>Handywork</option>
+                <option>Home Care Management</option>
+                <option>Home-Based Care</option>
+                <option>Horticulture</option>
+                <option>Horticulture Processing</option>
+                <option>House Keeping</option>
+                <option>Housekeeping</option>
+                <option>Industrial plant operations</option>
+                <option>Instrumentation and Control</option>
+                <option>Instrumentation and Control - Industrial Pneumatics</option>
+                <option>Insurance</option>
+                <option>Ladies Wear Outfits</option>
+                <option>Lathe Machine Operations</option>
+                <option>Leather Work</option>
+                <option>Manual Metal Arc Welding</option>
+                <option>Manual Metal Gas and Arc Welding</option>
+                <option>Marine Blasting</option>
+                <option>Masonry</option>
+                <option>Meat butchery attendant</option>
+                <option>Meat Slaughter house Attendant</option>
+                <option>Mechanical Engineering (Plant Option)</option>
+                <option>Mixology</option>
+                <option>Mobile Phone Repair</option>
+                <option>Motor Vehicle Electrics</option>
+                <option>Motor Vehicle Mechanics</option>
+                <option>Motorcycle Mechanics</option>
+                <option>Painting</option>
+                <option>Painting and Decoration</option>
+                <option>Panel Beating</option>
+                <option>Panel Beating and Spray Painting</option>
+                <option>Pipe Fitting</option>
+                <option>Plant and Service Engineering</option>
+                <option>Plumbing</option>
+                <option>Poultry broiler operator</option>
+                <option>Poultry Kienyeji Chicken Production Operator</option>
+                <option>Poultry layer operator</option>
+                <option>Rigging</option>
+                <option>Salesmanship</option>
+                <option>Scaffolding</option>
+                <option>Security Guard</option>
+                <option>Sheep Shearing</option>
+                <option>Slaughter house attendant</option>
+                <option>Social Work</option>
+                <option>Soil management</option>
+                <option>Solar PV installation</option>
+                <option>Solar PV Installation Technology</option>
+                <option>Spray Painting</option>
+                <option>Steel Fixing</option>
+                <option>Storekeeping</option>
+                <option>Tiling</option>
+                <option>Welding (Manual Arc Welding)</option>
+                <option>Welding (Oxy-Acetylene Gas Welding)</option>
+                <option>Welding and Fabrication</option>
+              </optgroup>
+              <optgroup label="── TVET: Level 4 (Craft Certificate)">
+                <option>Accommodation Operations</option>
+                <option>Accountancy</option>
+                <option>Accounting and Management Skills</option>
+                <option>Agricultural Engineering (Farm Power and Machinery)</option>
+                <option>Agriculture Extension</option>
+                <option>Agriculture Machinery and equipment</option>
+                <option>Animal Production</option>
+                <option>Apiary attendant</option>
+                <option>Apiculture</option>
+                <option>Aquaculture</option>
+                <option>Arc and Gas Welding</option>
+                <option>Autobody Repair</option>
+                <option>Automotive Engineering</option>
+                <option>Baking Technology</option>
+                <option>Balustrade Technology</option>
+                <option>Banking and Finance</option>
+                <option>Bartender</option>
+                <option>Bee hive and bee equipment construction</option>
+                <option>Bee products and processing</option>
+                <option>Bee Products Processing</option>
+                <option>Building artisan (masonry)</option>
+                <option>Business Administration</option>
+                <option>Business Management</option>
+                <option>Caregiving</option>
+                <option>Carpentry and Joinery</option>
+                <option>Carpentry and joining</option>
+                <option>Cartography</option>
+                <option>Catering and Accommodation Operations</option>
+                <option>CCTV Technology</option>
+                <option>Child Care and Protection</option>
+                <option>Christian Ministry</option>
+                <option>Clerical Operations</option>
+                <option>CNC Lathe Operations (Production)</option>
+                <option>CNC Milling Operations (Production)</option>
+                <option>Co-operative Management</option>
+                <option>Community Health</option>
+                <option>Community Wildlife Management</option>
+                <option>Computer and Mobile Repair</option>
+                <option>Concrete Field Testing</option>
+                <option>Concreting Technology</option>
+                <option>Construction plant Technology</option>
+                <option>Construction Survey</option>
+                <option>Creative Computer Designer</option>
+                <option>Cruise Animation</option>
+                <option>Dairy Farm Technology</option>
+                <option>Dairy Plant Management</option>
+                <option>Dairy Processing</option>
+                <option>Dairy Processing Technology</option>
+                <option>Detergent and Paint Production</option>
+                <option>Electric Installation Technology</option>
+                <option>Electrical Alarm Security System Technology</option>
+                <option>Electrical and Electronics Technology (Power)</option>
+                <option>Electrical and Electronics Technology (Telecommunication)</option>
+                <option>Electrical Engineering Technology</option>
+                <option>Electrical Technology</option>
+                <option>Engine Technology</option>
+                <option>Fashion and Apparel Design</option>
+                <option>Fashion Design Operation</option>
+                <option>Fashion design Technology</option>
+                <option>Fire Fighting</option>
+                <option>Fire Management - Technical Rescuer</option>
+                <option>Fire Management - Water Rescuer</option>
+                <option>Fisheries Science and Technology</option>
+                <option>Food and Beverage Production (Cookery)</option>
+                <option>Food and Beverage Production and Service</option>
+                <option>Food and Beverage Sales &amp; Service</option>
+                <option>Food and Beverage Waiter</option>
+                <option>Food Processing and Preservation</option>
+                <option>Food Processing and Preservation Technology</option>
+                <option>Food Production</option>
+                <option>Food Production (Culinary Arts)</option>
+                <option>Footwear</option>
+                <option>Form Work Technology</option>
+                <option>Garment Making</option>
+                <option>Geographical Information System(GIS) Technology</option>
+                <option>Guest House Accommodation</option>
+                <option>Gypsum Installation Technology</option>
+                <option>Health Care Assistance</option>
+                <option>Heavy and Light Machinery Operations (Excavator)</option>
+                <option>Heavy and Light Machinery Operations (Grader)</option>
+                <option>Home Based Care</option>
+                <option>Horticulture Production</option>
+                <option>Housekeeping and Laundry</option>
+                <option>Human Resource Management</option>
+                <option>Industrial Automation and Robotics</option>
+                <option>Industrial Automation and Robotics Operations</option>
+                <option>Industrial Plants</option>
+                <option>Information Studies</option>
+                <option>Information Technology</option>
+                <option>Instrumentation and Control (Simple Automation)</option>
+                <option>Instrumentation and Control Operation</option>
+                <option>Instrumentation and Control Technology</option>
+                <option>Interior Design</option>
+                <option>Internet Protocol</option>
+                <option>Investment Management</option>
+                <option>Kenyan Sign Language</option>
+                <option>Land Surveying</option>
+                <option>Lathe Machines Operator</option>
+                <option>Leather Goods</option>
+                <option>Library, Archives and Information Studies</option>
+                <option>Livestock Feed Production</option>
+                <option>Marine Engineering</option>
+                <option>Marine Painting</option>
+                <option>Marine Refrigeration and Air Conditioning Technician</option>
+                <option>Marine Welding</option>
+                <option>Maritime Transport Logistics</option>
+                <option>Maritime Transport Operations</option>
+                <option>Marketing</option>
+                <option>Meat Abattoir Operator</option>
+                <option>Meat Butchery Operations</option>
+                <option>Meat Processing</option>
+                <option>Meat Processing Technology</option>
+                <option>Mechanical Engineering</option>
+                <option>Mechanical Engineering (Construction)</option>
+                <option>Mechanical Engineering (Plant)</option>
+                <option>Mechanical Engineering (Production)</option>
+                <option>Mechanical Heavy &amp; Light Machinery Operations</option>
+                <option>Mechanical Piping Fabrication</option>
+                <option>Mechanical Production (Grinding and Fabrication)</option>
+                <option>Mechanical Production (Machine Operations)</option>
+                <option>Mechanical Production Machine Operation</option>
+                <option>Mechanical Technology and Maintenance</option>
+                <option>Medical Laboratory Technology</option>
+                <option>MIG and TIG Welding</option>
+                <option>Motor Cycle Repair</option>
+                <option>Motor Vehicle Body Repair</option>
+                <option>Nature Interpretation and Tour Administration</option>
+                <option>Nautical Science</option>
+                <option>Nutrition and Dietetics</option>
+                <option>Office Administrator</option>
+                <option>Office Assistant</option>
+                <option>Optical and Microwave Transmission</option>
+                <option>Personnel Management</option>
+                <option>Petroleum Geosciences</option>
+                <option>Photogrammetry</option>
+                <option>Pig Production</option>
+                <option>Plumbing Technology</option>
+                <option>Poultry (Kienyeji Chicken) Production</option>
+                <option>Poultry Broiler Production Attendant</option>
+                <option>Poultry Hatchery Operations</option>
+                <option>Poultry Layer Production Operations</option>
+                <option>Poultry Products Processing Operations</option>
+                <option>Printing Technology</option>
+                <option>Project Management</option>
+                <option>Radio Access Network</option>
+                <option>Radio Servicing</option>
+                <option>Records and Archives Management</option>
+                <option>Refrigeration and Air Conditioning</option>
+                <option>Road Construction</option>
+                <option>Road Transport</option>
+                <option>Road Transport Management</option>
+                <option>Sales and Marketing</option>
+                <option>Salt Processing</option>
+                <option>Scaffolding Technology</option>
+                <option>Science Laboratory Technology</option>
+                <option>Secretarial Studies</option>
+                <option>Security Guarding</option>
+                <option>Simple Automation Inspection</option>
+                <option>Social Development</option>
+                <option>Social Work and Community Development</option>
+                <option>Solar Installation</option>
+                <option>Solar Photovoltaic Installation</option>
+                <option>Solar PV System Installation</option>
+                <option>Spinning Machine Technician</option>
+                <option>Store keeping</option>
+                <option>Supplies Management</option>
+                <option>Supply Chain Management</option>
+                <option>Tannery and Leatherwork</option>
+                <option>Tile Laying Technology</option>
+                <option>Tour and Travel</option>
+                <option>Tour Guiding and Travel Operations</option>
+                <option>Tour Guiding Operations</option>
+                <option>Transport Management</option>
+                <option>Video Production</option>
+                <option>Water Engineering</option>
+                <option>Water Technology</option>
+                <option>Weaving Machine Operation</option>
+                <option>Website Developer</option>
+                <option>Welding</option>
+                <option>Welding (Gas Welding and Gas Tungsten Arc Welding)</option>
+                <option>Wildlife Guide</option>
+                <option>Wildlife Tour Guiding</option>
+              </optgroup>
+              <optgroup label="── TVET: Level 5/6 (Diploma &amp; Higher Diploma)">
+                <option>Accounting Technicians Diploma</option>
+                <option>Addiction Counselling</option>
+                <option>Advanced Emergency Medical Technician</option>
+                <option>Aeronautical Engineering</option>
+                <option>Aeronautical Engineering (Airframe and Engines)</option>
+                <option>Aeronautical Engineering (Avionics)</option>
+                <option>Agribusiness Management and Marketing</option>
+                <option>Agricultural Education and Extension</option>
+                <option>Agricultural Engineering</option>
+                <option>Agricultural Extension</option>
+                <option>Agricultural Extension and Community Development</option>
+                <option>Agricultural Extension Technology</option>
+                <option>Agricultural Irrigation and Drainage Engineering</option>
+                <option>Agriculture</option>
+                <option>Agriculture and Biotechnology</option>
+                <option>Agriculture, Human Ecology and Consumer Science</option>
+                <option>Air Cargo Management</option>
+                <option>Analytical Chemistry</option>
+                <option>Animal health and production</option>
+                <option>Animal Production and Health Management</option>
+                <option>Animation and Digital Media</option>
+                <option>Apiculture (Bee Technology)</option>
+                <option>Applied Biology</option>
+                <option>Applied Statistics</option>
+                <option>Architectural draftsmanship</option>
+                <option>Architecture</option>
+                <option>Art and Design</option>
+                <option>Art and Design (Graphic Design)</option>
+                <option>Art and Design (Painting)</option>
+                <option>Art and Design (Sculpture)</option>
+                <option>Auto Body Technology</option>
+                <option>Automotive Engineering Technology</option>
+                <option>Automotive Mechatronics Technology</option>
+                <option>Automotive Technology</option>
+                <option>Baking and Patisserie</option>
+                <option>Baking Technology - cake decoration</option>
+                <option>Biomedical Engineering Technology</option>
+                <option>Biotechnology</option>
+                <option>Building and Civil Engineering</option>
+                <option>Building Construction</option>
+                <option>Carpentry Technology</option>
+                <option>Catering and Accommodation Management</option>
+                <option>Catering and Accommodation practitioner</option>
+                <option>Ceramic Technology</option>
+                <option>Ceramics Technology</option>
+                <option>Chain Supply Management</option>
+                <option>Chemical and process Engineering</option>
+                <option>Chemical Engineering</option>
+                <option>Child Protection</option>
+                <option>Christian Chaplaincy</option>
+                <option>Civil Engineering</option>
+                <option>Clinical Medicine</option>
+                <option>Clothing Technology</option>
+                <option>Community Health Worker</option>
+                <option>Community Policing</option>
+                <option>Computer Studies</option>
+                <option>Construction Management Foreperson</option>
+                <option>Construction Plant</option>
+                <option>Construction Plant Engineering</option>
+                <option>Cooperative Management</option>
+                <option>Counselling</option>
+                <option>Counselling (Chemical Dependency and Addictions)</option>
+                <option>Counselling (Child and Adolescent Counselling)</option>
+                <option>Counselling (Disaster Management and Trauma Counselling)</option>
+                <option>Counselling (Guidance and Counselling In Learning Institutions)</option>
+                <option>Counselling (Hiv Testing and Counselling In Community And Clinical Setting)</option>
+                <option>Counselling (Marriage and Family Therapy)</option>
+                <option>Counselling (Special Needs and Disability)</option>
+                <option>Counselling (Spiritual Counselling)</option>
+                <option>Counselling psychology</option>
+                <option>Credit Management</option>
+                <option>Credit officer</option>
+                <option>Criminal Justice Management</option>
+                <option>Criminology and Criminal Justice</option>
+                <option>Culinary Arts</option>
+                <option>Customs Administration</option>
+                <option>Cyber Security</option>
+                <option>Dairy Plant Technology</option>
+                <option>Dairy Technology</option>
+                <option>Data Communication and Computer Network Technician</option>
+                <option>Dietetics Management</option>
+                <option>Diploma in Technical Instructor Education</option>
+                <option>Diploma in Technical Trainer Education</option>
+                <option>Disaster Management</option>
+                <option>Electrical and Electronic Engineering Technology</option>
+                <option>Electrical and Electronics Engineering (Instrumentation)</option>
+                <option>Electrical and Electronics Engineering (Power)</option>
+                <option>Electrical and Electronics Engineering (Telecommunication)</option>
+                <option>Electrical Engineering</option>
+                <option>Electrical Operation (Power Option)</option>
+                <option>Electrical Security System Technician</option>
+                <option>Electrical Solar Installation Technician</option>
+                <option>Electronics Technology (Devices and Systems)</option>
+                <option>Electrotechnical Engineering</option>
+                <option>Entrepreneurial Agriculture</option>
+                <option>Entrepreneurship Development</option>
+                <option>Environmental Management</option>
+                <option>Environmental Science and Technology</option>
+                <option>Environmental Technology</option>
+                <option>Farm Business Management</option>
+                <option>Fashion Design and Clothing Technology</option>
+                <option>Financial Sales</option>
+                <option>Fine Arts</option>
+                <option>Fingerprint and Biometrics Technology</option>
+                <option>Fisheries and Aquatic Science</option>
+                <option>Fitness instruction and recreation management</option>
+                <option>Food and Beverage Management</option>
+                <option>Food and Beverage Operations</option>
+                <option>Food and Beverage Production, Sales and Service Management</option>
+                <option>Food and Beverage Technology</option>
+                <option>Food Processing</option>
+                <option>Food production culinary arts</option>
+                <option>Food Science and Nutrition</option>
+                <option>Food Science and Processing Technology</option>
+                <option>Food Technology</option>
+                <option>Footwear production</option>
+                <option>Forensic Investigation</option>
+                <option>Forest Management</option>
+                <option>Freight Operations</option>
+                <option>Front Office Operation</option>
+                <option>General Agriculture and Extension</option>
+                <option>Geophysical Exploration</option>
+                <option>Graphic Design</option>
+                <option>Hair Dressing Operations Technology</option>
+                <option>Health Records</option>
+                <option>Health Records and Information Technology</option>
+                <option>Health Systems Support Services</option>
+                <option>Healthcare Support Services</option>
+                <option>Highway Engineering</option>
+                <option>Horticulture Farm Technology</option>
+                <option>Hotel Management</option>
+                <option>Housekeeping Management</option>
+                <option>Industrial Automation and Robotics Technology</option>
+                <option>Information and Communication Technology</option>
+                <option>Information Science</option>
+                <option>Instrumentation and Control Engineering</option>
+                <option>Integrated Pest Management</option>
+                <option>Interior Design Finishing</option>
+                <option>International Freight Management</option>
+                <option>International Hospitality Management</option>
+                <option>Kenya Registered Community Health Nursing</option>
+                <option>Leather Goods Production</option>
+                <option>Leather Processing (Tanning)</option>
+                <option>Legal Secretarial Studies</option>
+                <option>Library and Information Management</option>
+                <option>Library and Information Studies</option>
+                <option>Mandarin Chinese Language and Culture</option>
+                <option>Map Reproduction</option>
+                <option>Marine Welding and Fabrication</option>
+                <option>Marriage and family therapy</option>
+                <option>Mechanical Engineering (Construction Plant Engineering)</option>
+                <option>Mechanical Engineering (Construction Plant)</option>
+                <option>Mechanical Engineering (Fabrication and Metallurgy)</option>
+                <option>Mechanical Engineering (Fabrication Technology and Metallurgy)</option>
+                <option>Mechanical Engineering (Materials and Metallurgy)</option>
+                <option>Mechanical Plant Engineering</option>
+                <option>Mechanical Plant Technology</option>
+                <option>Mechanical Production Technician</option>
+                <option>Mechanical Production Technology</option>
+                <option>Mechatronics</option>
+                <option>Medical Engineering</option>
+                <option>Medical Engineering Technology</option>
+                <option>Mortuary Science</option>
+                <option>Music Art</option>
+                <option>Network System Administration</option>
+                <option>Network System Administrator</option>
+                <option>Office Administration</option>
+                <option>Office Management</option>
+                <option>Oil and Gas Economics</option>
+                <option>Oil Pipeline Fire Officer</option>
+                <option>Oil Pipeline Instrumentation and Control</option>
+                <option>Oil Pipeline Laboratory Technology</option>
+                <option>Oil Pipeline Mechanical Maintenance</option>
+                <option>Oil Pipeline Operations</option>
+                <option>Operation Theatre Technology</option>
+                <option>Orthopedic and Trauma Medicine</option>
+                <option>Paramedic</option>
+                <option>Paramilitary and Wildlife Law Enforcement</option>
+                <option>Perioperative Theatre Technology</option>
+                <option>Petroleum Geoscience</option>
+                <option>Petroleum Management</option>
+                <option>Pharmaceutical Technology</option>
+                <option>Pharmacy</option>
+                <option>Photogrammetry and Remote Sensing</option>
+                <option>Plumbing Craftsmanship</option>
+                <option>Point of Care Ultrasound</option>
+                <option>Post press</option>
+                <option>Poultry Breeding Operations</option>
+                <option>Poultry Farm Manager</option>
+                <option>Poultry Processing Operator</option>
+                <option>Pre-press</option>
+                <option>Press printing technician</option>
+                <option>Printing</option>
+                <option>Procurement &amp; Supply Chain Management</option>
+                <option>Product Design</option>
+                <option>Quality Management</option>
+                <option>Quantity Surveying</option>
+                <option>Record Management</option>
+                <option>Record Management &amp; Information Technology</option>
+                <option>Records and Archives</option>
+                <option>Science Laboratory Practice</option>
+                <option>Science Laboratory Technology with Instrumentation</option>
+                <option>Security and intelligence</option>
+                <option>Security Management</option>
+                <option>Soft furnishing</option>
+                <option>Software Development</option>
+                <option>Solar PV</option>
+                <option>Spinning</option>
+                <option>Spinning Machine Maintenance Technician</option>
+                <option>Sports coaching</option>
+                <option>Store Management</option>
+                <option>Sustainable Agriculture And Rural Development</option>
+                <option>Sustainable Agriculture for Rural Development</option>
+                <option>Sustainable Rural and Urban Agriculture</option>
+                <option>Tax Administration</option>
+                <option>Technical trainer</option>
+                <option>Telecommunication Engineering</option>
+                <option>Textile Processing</option>
+                <option>Textile Technology</option>
+                <option>Tour and Travel Operations</option>
+                <option>Tour Guide</option>
+                <option>Tour Guiding Management</option>
+                <option>Tour Operation</option>
+                <option>Tourism and Business Studies</option>
+                <option>Tourism and Hospitality</option>
+                <option>Tourism Management</option>
+                <option>Water Technology (Ground Water)</option>
+                <option>Water Technology (Sanitation)</option>
+                <option>Water Technology (Surface Water)</option>
+                <option>Water Technology (Water Supply)</option>
+                <option>Weaving Machine Maintenance Technology</option>
+                <option>Welding and Fabrications</option>
+                <option>Wildlife Management</option>
+                <option>Wine Technology</option>
+              </optgroup>
+
+              <optgroup label="── Life Skills &amp; Other">
+                <option>Life Skills</option>
+                <option>Financial Literacy</option>
+                <option>Religious &amp; Moral Education</option>
+                <option>Cultural Studies</option>
+                <option>Media Literacy</option>
+                <option>Study Skills</option>
+                <option>Library &amp; Research Skills</option>
+                <option>Special Education</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="gradeLevel">Grade / Level <span class="req">*</span></label>
+              <select id="gradeLevel" name="gradeLevel" required>
+                <option value="">Select level…</option>
+                <optgroup label="Primary">
+                  <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
+                  <option>Grade 4</option><option>Grade 5</option><option>Grade 6</option>
+                </optgroup>
+                <optgroup label="Secondary">
+                  <option>Grade 7</option><option>Grade 8</option><option>Grade 9</option>
+                  <option>Grade 10</option><option>Grade 11</option><option>Grade 12</option>
+                </optgroup>
+                <optgroup label="Higher Education">
+                  <option>College / University</option>
+                  <option>TVET / Vocational</option>
+                  <option>Adult Learning</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="field">
+              <label for="duration">Duration</label>
+              <select id="duration" name="duration">
+                <option value="30">30 min</option>
+                <option value="45">45 min</option>
+                <option value="60" selected>60 min</option>
+                <option value="75">75 min</option>
+                <option value="90">90 min</option>
+                <option value="120">120 min</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="studentCount">No. of Students</label>
+              <input type="number" id="studentCount" name="studentCount" placeholder="e.g. 30" min="1" />
+            </div>
+            <div class="field">
+              <label for="teachingStyle">Teaching Style</label>
+              <select id="teachingStyle" name="teachingStyle">
+                <option>Mixed / Blended</option>
+                <option>Direct Instruction</option>
+                <option>Inquiry-Based</option>
+                <option>Project-Based Learning</option>
+                <option>Flipped Classroom</option>
+                <option>Cooperative Learning</option>
+                <option>Socratic Method</option>
+                <option>Differentiated Instruction</option>
+                <option>Experiential / Hands-On</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Learning Objectives multi-select -->
+          <div class="field">
+            <label>Learning Objectives <span class="req">*</span></label>
+            <div class="ms-wrapper" id="ms-wrapper">
+              <div class="ms-control" id="ms-control" tabindex="0" role="button" aria-haspopup="listbox">
+                <div class="ms-tags" id="ms-tags">
+                  <span class="ms-placeholder" id="ms-placeholder">Select objectives…</span>
+                </div>
+                <svg class="ms-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+
+              <div class="ms-panel hidden" id="ms-panel" role="listbox">
+                <div class="ms-search-wrap">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input class="ms-search" id="ms-search" type="text" placeholder="Search objectives…" autocomplete="off" />
+                </div>
+
+                <div class="ms-list" id="ms-list">
+
+                  <div class="ms-group-head" data-level="remember">🔵 Remember — Level 1</div>
+                  <label class="ms-item"><input type="checkbox" value="Define key terms and vocabulary" /><span>Define key terms and vocabulary</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Recall facts and basic concepts" /><span>Recall facts and basic concepts</span></label>
+                  <label class="ms-item"><input type="checkbox" value="List the steps in a process" /><span>List the steps in a process</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Identify main components or parts" /><span>Identify main components or parts</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Name and label key elements" /><span>Name and label key elements</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Match terms to their definitions" /><span>Match terms to their definitions</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Recognise patterns and sequences" /><span>Recognise patterns and sequences</span></label>
+
+                  <div class="ms-group-head" data-level="understand">🟢 Understand — Level 2</div>
+                  <label class="ms-item"><input type="checkbox" value="Explain concepts in their own words" /><span>Explain concepts in their own words</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Summarise the main ideas" /><span>Summarise the main ideas</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Describe cause and effect relationships" /><span>Describe cause and effect relationships</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Compare and contrast two or more concepts" /><span>Compare and contrast two or more concepts</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Classify items into appropriate categories" /><span>Classify items into appropriate categories</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Interpret data, diagrams, or text" /><span>Interpret data, diagrams, or text</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Paraphrase key ideas accurately" /><span>Paraphrase key ideas accurately</span></label>
+
+                  <div class="ms-group-head" data-level="apply">🟡 Apply — Level 3</div>
+                  <label class="ms-item"><input type="checkbox" value="Solve problems using learned concepts" /><span>Solve problems using learned concepts</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Use formulas and procedures correctly" /><span>Use formulas and procedures correctly</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Demonstrate a skill or technique" /><span>Demonstrate a skill or technique</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Apply rules or principles to new situations" /><span>Apply rules or principles to new situations</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Calculate and present results accurately" /><span>Calculate and present results accurately</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Construct a model, diagram, or chart" /><span>Construct a model, diagram, or chart</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Conduct an experiment or investigation" /><span>Conduct an experiment or investigation</span></label>
+
+                  <div class="ms-group-head" data-level="analyze">🟠 Analyse — Level 4</div>
+                  <label class="ms-item"><input type="checkbox" value="Analyse data and draw evidence-based conclusions" /><span>Analyse data and draw evidence-based conclusions</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Break down complex ideas into parts" /><span>Break down complex ideas into parts</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Differentiate between multiple approaches or solutions" /><span>Differentiate between multiple approaches or solutions</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Examine relationships between concepts" /><span>Examine relationships between concepts</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Identify assumptions, biases, or gaps in reasoning" /><span>Identify assumptions, biases, or gaps in reasoning</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Organise information to reveal patterns or trends" /><span>Organise information to reveal patterns or trends</span></label>
+
+                  <div class="ms-group-head" data-level="evaluate">🔴 Evaluate — Level 5</div>
+                  <label class="ms-item"><input type="checkbox" value="Evaluate arguments and supporting evidence" /><span>Evaluate arguments and supporting evidence</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Justify a position or decision with reasoning" /><span>Justify a position or decision with reasoning</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Assess the effectiveness of a solution or strategy" /><span>Assess the effectiveness of a solution or strategy</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Critique a work, plan, or approach" /><span>Critique a work, plan, or approach</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Make evidence-based recommendations" /><span>Make evidence-based recommendations</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Prioritise options based on defined criteria" /><span>Prioritise options based on defined criteria</span></label>
+
+                  <div class="ms-group-head" data-level="create">🟣 Create — Level 6</div>
+                  <label class="ms-item"><input type="checkbox" value="Design an original product or solution" /><span>Design an original product or solution</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Develop a plan, proposal, or strategy" /><span>Develop a plan, proposal, or strategy</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Construct or build a working model" /><span>Construct or build a working model</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Write an original piece, report, or essay" /><span>Write an original piece, report, or essay</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Create a presentation, video, or portfolio" /><span>Create a presentation, video, or portfolio</span></label>
+                  <label class="ms-item"><input type="checkbox" value="Compose or produce an original creative work" /><span>Compose or produce an original creative work</span></label>
+
+                </div><!-- /ms-list -->
+              </div><!-- /ms-panel -->
+            </div><!-- /ms-wrapper -->
+            <!-- hidden input carries the joined value for the API -->
+            <input type="hidden" id="objectives" name="objectives" />
+          </div>
+
+          <div class="field">
+            <label for="priorKnowledge">Prior Knowledge</label>
+            <textarea id="priorKnowledge" name="priorKnowledge" rows="2"
+              placeholder="What do students already know?"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="notes">Special Notes</label>
+            <textarea id="notes" name="notes" rows="2"
+              placeholder="Accommodations, standards to meet, available resources…"></textarea>
+          </div>
+
+          <button type="submit" id="generate-btn" class="btn-generate">
+            <span class="btn-icon">✨</span>
+            <span class="btn-text">Generate Plan</span>
+          </button>
+
+        </form>
+      </aside>
+
+      <!-- Right: Output panel -->
+      <main class="output-panel">
+
+        <!-- Empty -->
+        <div id="out-empty" class="out-empty">
+          <div class="out-empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3>Your plan will appear here</h3>
+          <p>Fill in the form and click <strong>Generate Plan</strong> to create a detailed AI-powered teaching document.</p>
+        </div>
+
+        <!-- Output -->
+        <div id="out-result" class="out-result hidden">
+          <div class="out-toolbar">
+            <span id="out-title" class="out-title"></span>
+            <div class="out-actions">
+              <button id="copy-btn" class="btn-tool">📋 Copy</button>
+              <button id="print-btn" class="btn-tool">🖨️ Print</button>
+            </div>
+          </div>
+          <div id="lesson-output" class="lesson-output"></div>
+        </div>
+
+        <!-- Error -->
+        <div id="out-error" class="out-error hidden">
+          <div class="out-error-icon">⚠️</div>
+          <h3>Could not connect to AI</h3>
+          <p id="error-message"></p>
+          <div class="error-steps">
+            <p><strong>To fix:</strong></p>
+            <ol>
+              <li>Get a free API key at <strong>aistudio.google.com/app/apikey</strong></li>
+              <li>Create a <code>.env</code> file: <code>GOOGLE_API_KEY=your_key</code></li>
+              <li>Restart the server: <code>npm start</code></li>
+            </ol>
+          </div>
+          <button id="retry-btn" class="btn-retry">Try Again</button>
+        </div>
+
+      </main>
+    </div>
+
+  </div><!-- /page-workspace -->
+
+  <script src="app.js"></script>
+</body>
+</html>
