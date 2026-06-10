@@ -76,7 +76,12 @@ app.post('/api/generate', async (req, res) => {
   res.setHeader('Connection', 'keep-alive');
   res.flushHeaders();
 
+  // Document header (institution/trainer details) is deterministic — send it
+  // immediately so it always appears, regardless of which AI provider is used.
+  res.write(`data: ${JSON.stringify({ text: buildHeader(req.body) })}\n\n`);
+
   const prompt = buildPrompt(req.body);
+  const footer = buildFooter(req.body);
 
   // Decide provider: Ollama (local) → Claude (primary cloud) → Google (fallback)
   let provider = FORCED_PROVIDER;
@@ -91,11 +96,11 @@ app.post('/api/generate', async (req, res) => {
   }
 
   if (provider === 'ollama') {
-    await streamOllama(prompt, res);
+    await streamOllama(prompt, res, footer);
   } else if (provider === 'claude' && ANTHROPIC_KEY) {
-    await streamClaude(prompt, res);
+    await streamClaude(prompt, res, footer);
   } else if (provider === 'google' && GOOGLE_KEY) {
-    await streamGoogle(prompt, res);
+    await streamGoogle(prompt, res, footer);
   } else {
     res.write(`data: ${JSON.stringify({ error: 'No AI provider available. Start Ollama or set ANTHROPIC_API_KEY / GOOGLE_API_KEY.' })}\n\n`);
     res.end();
@@ -103,7 +108,7 @@ app.post('/api/generate', async (req, res) => {
 });
 
 // ── Ollama streaming ──────────────────────────────────────────
-async function streamOllama(prompt, res) {
+async function streamOllama(prompt, res, footer) {
   try {
     const r = await fetch(`${OLLAMA_URL}/api/generate`, {
       method: 'POST',
@@ -129,7 +134,10 @@ async function streamOllama(prompt, res) {
         try {
           const d = JSON.parse(line);
           if (d.response) res.write(`data: ${JSON.stringify({ text: d.response })}\n\n`);
-          if (d.done)     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+          if (d.done) {
+            res.write(`data: ${JSON.stringify({ text: footer })}\n\n`);
+            res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+          }
         } catch { /* skip */ }
       }
     }
@@ -140,7 +148,7 @@ async function streamOllama(prompt, res) {
 }
 
 // ── Claude streaming (primary cloud provider) ─────────────────
-async function streamClaude(prompt, res) {
+async function streamClaude(prompt, res, footer) {
   try {
     const Anthropic = require('@anthropic-ai/sdk');
     const anthropic = new Anthropic({ apiKey: ANTHROPIC_KEY });
@@ -156,6 +164,7 @@ async function streamClaude(prompt, res) {
     });
 
     await stream.finalMessage();
+    res.write(`data: ${JSON.stringify({ text: footer })}\n\n`);
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   } catch (err) {
     res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
@@ -164,7 +173,7 @@ async function streamClaude(prompt, res) {
 }
 
 // ── Google AI streaming ───────────────────────────────────────
-async function streamGoogle(prompt, res) {
+async function streamGoogle(prompt, res, footer) {
   try {
     const { GoogleGenerativeAI } = require('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(GOOGLE_KEY);
@@ -175,11 +184,56 @@ async function streamGoogle(prompt, res) {
       const text = chunk.text();
       if (text) res.write(`data: ${JSON.stringify({ text })}\n\n`);
     }
+    res.write(`data: ${JSON.stringify({ text: footer })}\n\n`);
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
   } catch (err) {
     res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
   }
   res.end();
+}
+
+// ── Document header (deterministic, not AI-generated) ─────────
+function buildHeader(data) {
+  const {
+    subject, gradeLevel, duration, institution, department, unitCode, knqfLevel,
+    term, year, trainerName, trainerReg, venue, theoryHours, practicalHours, attachmentHours
+  } = data;
+
+  const dur = parseInt(duration) || 60;
+  const v = x => (x && String(x).trim()) ? String(x).trim() : '—';
+
+  return `**Ref Code:** KSTVET/TP/LP/FO
+
+| Field | Details | Field | Details |
+|---|---|---|---|
+| Institution | ${v(institution)} | Department | ${v(department)} |
+| Unit Code | ${v(unitCode)} | Unit Title | ${v(subject)} |
+| KNQF Level | ${v(knqfLevel)} | Grade / Level | ${v(gradeLevel)} |
+| Term | ${v(term)} | Year | ${v(year)} |
+| Trainer | ${v(trainerName)} | Trainer Reg. No. | ${v(trainerReg)} |
+| Venue | ${v(venue)} | Session Duration | ${dur} minutes |
+| Theory (hrs) | ${v(theoryHours)} | Practical (hrs) | ${v(practicalHours)} |
+| Attachment (hrs) | ${v(attachmentHours)} | | |
+
+---
+
+`;
+}
+
+// ── Trainer verification footer (deterministic, not AI-generated) ──
+function buildFooter(data) {
+  const trainerName = (data.trainerName || '').trim();
+
+  return `
+
+---
+
+## Trainer's Verification
+
+| Trainer Name | Signature | Date |
+|---|---|---|
+| ${trainerName || ' '} |  |  |
+`;
 }
 
 // ── Prompt builder ────────────────────────────────────────────
@@ -198,9 +252,19 @@ function buildPrompt(data) {
     : planType === 'assessment' ? 'Assessment Plan'
     : 'Lesson Plan';
 
-  return `You are an expert teacher and curriculum designer. Create a detailed, ready-to-use ${typeLabel} using Markdown formatting.
+  const overviewLabel = planType === 'unit' ? 'Unit Overview'
+    : planType === 'assessment' ? 'Assessment Overview'
+    : 'Lesson Overview';
 
-**Subject:** ${subject}
+  const sessionPlanGuidance = planType === 'unit'
+    ? `Add one row per week of the unit (Week 1, Week 2, ... as many weeks as needed to cover the objectives). Each row covers that week's topic, the outcome/performance criteria addressed, trainer and trainee activities, resources & references, and the assessment method. Leave the Reflection cell empty for the trainer to complete after delivery.`
+    : planType === 'assessment'
+    ? `Add one row per assessment task or activity. Each row covers the task, the outcome/performance criteria it assesses, what the trainer and trainee do during the assessment, resources & references, and the assessment method with marks available. Leave the Reflection cell empty for the trainer to complete after delivery.`
+    : `Add one row per phase of the lesson (Warm-Up/Hook, Direct Instruction, Guided Practice, Independent Practice, Assessment & Wrap-Up). Use "Wk 1 / Sess 1" in the Wk/Sess column for every row. The Title column names the phase and its duration in minutes (Warm-Up/Hook ${warmup} min, Direct Instruction ${instruction} min, Guided Practice ${guided} min, Independent Practice ${independent} min, Assessment & Wrap-Up ${wrapup} min). Outcome & PC links to the relevant learning objective. Trainer Activity and Trainee Activity describe what each does in that phase. Resources & References lists materials used. Assessment describes the formative check for that phase. Leave the Reflection cell empty for the trainer to complete after delivery.`;
+
+  return `You are an expert teacher and curriculum designer. Create a detailed, ready-to-use ${typeLabel} using Markdown formatting, following a TVET/CDACC-style lesson plan format.
+
+**Subject / Unit Title:** ${subject}
 **Grade / Level:** ${gradeLevel}
 **Duration:** ${dur} minutes
 **Students:** ${studentCount || 'Not specified'}
@@ -216,82 +280,14 @@ FORMATTING RULES (follow strictly):
 - Use plain, professional section headings (e.g. "## Lesson Overview", not "## 📚 Lesson Overview").
 - Wherever the content is a list of structured items (objectives, materials, schedules, tasks, criteria), present it as a Markdown table with clear column headers, like a formal register or planning document — not a bulleted list with emojis.
 - Keep prose sections concise and businesslike.
+- Do NOT include a document header table with institution/trainer details, and do NOT include a trainer signature section — those are generated separately and added automatically.
 
-${planType === 'assessment' ? `
-## Assessment Overview
-Brief description of what this assessment covers and its purpose.
-
-## Assessment Objectives
-| # | Objective | Linked Learning Outcome |
-|---|-----------|--------------------------|
-| 1 | ... | ... |
-| 2 | ... | ... |
-
-## Assessment Methods
-| Method | Type (Formative/Summative) | Purpose |
-|--------|------------------------------|---------|
-| ... | ... | ... |
-
-## Assessment Tasks
-| Task # | Description | Format | Marks |
-|--------|-------------|--------|-------|
-| 1 | ... | ... | ... |
-
-## Marking Rubric
-| Criterion | Excellent (4) | Proficient (3) | Developing (2) | Beginning (1) |
-|-----------|--------------|----------------|----------------|---------------|
-| ...       | ...          | ...            | ...            | ...           |
-
-## Accommodations
-How to modify the assessment for diverse learners.
-
-## Feedback Strategies
-How to deliver meaningful feedback to students after assessment.
-` : planType === 'unit' ? `
-## Unit Overview
-A 2–3 sentence summary of the unit, its purpose, and how it fits into the broader curriculum.
-
-## Unit Learning Objectives
-| # | Objective |
-|---|-----------|
-| 1 | ... |
-| 2 | ... |
-
-## Required Resources
-| Resource | Type | Purpose |
-|----------|------|---------|
-| ... | ... | ... |
-
-## Weekly Session Plan
-| Week | Topic | Key Activities | Assessment |
-|------|-------|----------------|------------|
-| 1    | ...   | ...            | ...        |
-| 2    | ...   | ...            | ...        |
-| 3    | ...   | ...            | ...        |
-| 4    | ...   | ...            | ...        |
-
-## Skill Progression
-How skills and knowledge build week by week.
-
-## Assessment Plan
-Formative checks and summative tasks across the unit.
-
-## Differentiation Strategies
-| Learner Group | Strategy |
-|----------------|----------|
-| Advanced learners | ... |
-| Struggling learners | ... |
-| ELL / ESL students | ... |
-
-## Teacher Notes
-Pacing tips, common pitfalls, and reflection prompts.
-` : `
-## Lesson Overview
-A concise 2–3 sentence summary of the lesson.
+## ${overviewLabel}
+A concise 2–3 sentence summary of the ${planType === 'unit' ? 'unit' : planType === 'assessment' ? 'assessment' : 'lesson'} and its purpose.
 
 ## Learning Objectives
-| # | Objective | Bloom's Level |
-|---|-----------|----------------|
+| # | Objective | Bloom's Level / Performance Criteria |
+|---|-----------|----------------------------------------|
 | 1 | ... | ... |
 | 2 | ... | ... |
 
@@ -300,30 +296,19 @@ A concise 2–3 sentence summary of the lesson.
 |---|------|-------|
 | 1 | ... | ... |
 
-## Lesson Structure
-| Phase | Duration | Description |
-|-------|----------|--------------|
-| Warm-Up / Hook | ${warmup} min | ... |
-| Direct Instruction | ${instruction} min | ... |
-| Guided Practice | ${guided} min | ... |
-| Independent Practice | ${independent} min | ... |
-| Assessment & Wrap-Up | ${wrapup} min | ... |
+## Session Plan
+${sessionPlanGuidance}
 
-### Warm-Up / Hook (${warmup} min)
-An engaging opener to activate prior knowledge.
+| Wk/Sess | Title | Outcome & PC | Trainer Activity | Trainee Activity | Resources & References | Assessment | Reflection |
+|---------|-------|---------------|--------------------|---------------------|---------------------------|------------|------------|
+| ... | ... | ... | ... | ... | ... | ... | |
 
-### Direct Instruction (${instruction} min)
-Key concepts, explanations, examples, and analogies.
-
-### Guided Practice (${guided} min)
-Teacher and students work through examples together.
-
-### Independent Practice (${independent} min)
-Student task to apply learning independently.
-
-### Assessment & Wrap-Up (${wrapup} min)
-Exit ticket or formative check plus closing reflection.
-
+${planType === 'assessment' ? `
+## Marking Rubric
+| Criterion | Excellent (4) | Proficient (3) | Developing (2) | Beginning (1) |
+|-----------|--------------|----------------|----------------|---------------|
+| ...       | ...          | ...            | ...            | ...           |
+` : ''}
 ## Differentiation Strategies
 | Learner Group | Strategy |
 |----------------|----------|
@@ -331,15 +316,15 @@ Exit ticket or formative check plus closing reflection.
 | Struggling learners | ... |
 | ELL / ESL students | ... |
 
-## Assessment Methods
-Formative and summative approaches.
-
+${planType === 'assessment' ? `
+## Feedback Strategies
+How to deliver meaningful feedback to students after assessment.
+` : `
 ## Homework / Extension Activities
 1–3 optional follow-up tasks.
-
-## Teacher Notes & Tips
-Misconceptions to watch for, pacing advice, reflection prompts.
 `}
+## Teacher Notes
+${planType === 'unit' ? 'Pacing tips, common pitfalls, and reflection prompts.' : 'Misconceptions to watch for, pacing advice, reflection prompts.'}
 
 Make this immediately usable in a real classroom. Be detailed, specific, and practical.`;
 }

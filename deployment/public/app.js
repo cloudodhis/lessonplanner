@@ -293,7 +293,19 @@ form.addEventListener('submit', async e => {
     teachingStyle:  form.teachingStyle.value,
     objectives,
     priorKnowledge: form.priorKnowledge.value.trim(),
-    notes:          form.notes.value.trim()
+    notes:          form.notes.value.trim(),
+    institution:     form.institution.value.trim(),
+    department:      form.department.value.trim(),
+    unitCode:        form.unitCode.value.trim(),
+    knqfLevel:       form.knqfLevel.value.trim(),
+    term:            form.term.value,
+    year:            form.year.value.trim(),
+    trainerName:     form.trainerName.value.trim(),
+    trainerReg:      form.trainerReg.value.trim(),
+    venue:           form.venue.value.trim(),
+    theoryHours:     form.theoryHours.value.trim(),
+    practicalHours:  form.practicalHours.value.trim(),
+    attachmentHours: form.attachmentHours.value.trim()
   });
 });
 
@@ -415,7 +427,14 @@ function downloadAs(format) {
   const name = getFileName();
 
   if (format === 'pdf') {
-    window.print();
+    html2pdf().set({
+      margin:      10,
+      filename:    `${name}.pdf`,
+      image:       { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:   { mode: ['avoid-all', 'css', 'legacy'] }
+    }).from(lessonOutput).save();
     return;
   }
 

@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -121,9 +122,85 @@
 
         <form id="lesson-form">
 
+          <!-- Institution & Trainer details (TVET / CDACC document header) -->
+          <details class="field-group" open>
+            <summary>Institution &amp; Trainer Details</summary>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="institution">Institution</label>
+                <input type="text" id="institution" name="institution" placeholder="e.g. Kisumu Technical Training Institute" />
+              </div>
+              <div class="field">
+                <label for="department">Department</label>
+                <input type="text" id="department" name="department" placeholder="e.g. Automotive &amp; Mechanical Engineering" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="unitCode">Unit Code</label>
+                <input type="text" id="unitCode" name="unitCode" placeholder="e.g. AURASA002" />
+              </div>
+              <div class="field">
+                <label for="knqfLevel">KNQF Level</label>
+                <input type="text" id="knqfLevel" name="knqfLevel" placeholder="e.g. Level 4" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="term">Term</label>
+                <select id="term" name="term">
+                  <option value="">Select term…</option>
+                  <option>Term 1</option>
+                  <option>Term 2</option>
+                  <option>Term 3</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="year">Year</label>
+                <input type="number" id="year" name="year" placeholder="e.g. 2026" min="2000" max="2100" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="trainerName">Trainer Name</label>
+                <input type="text" id="trainerName" name="trainerName" placeholder="e.g. Austine" />
+              </div>
+              <div class="field">
+                <label for="trainerReg">Trainer Reg. No.</label>
+                <input type="text" id="trainerReg" name="trainerReg" placeholder="e.g. TR/2023/1234" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="venue">Venue</label>
+                <input type="text" id="venue" name="venue" placeholder="e.g. Classroom / Workshop" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="theoryHours">Theory (hrs)</label>
+                <input type="number" id="theoryHours" name="theoryHours" placeholder="e.g. 2" min="0" step="0.5" />
+              </div>
+              <div class="field">
+                <label for="practicalHours">Practical (hrs)</label>
+                <input type="number" id="practicalHours" name="practicalHours" placeholder="e.g. 2" min="0" step="0.5" />
+              </div>
+              <div class="field">
+                <label for="attachmentHours">Attachment (hrs)</label>
+                <input type="number" id="attachmentHours" name="attachmentHours" placeholder="e.g. 1" min="0" step="0.5" />
+              </div>
+            </div>
+          </details>
+
           <!-- Subject dropdown -->
           <div class="field">
-            <label for="subject">Subject <span class="req">*</span></label>
+            <label for="subject">Subject / Unit Title <span class="req">*</span></label>
             <select id="subject" name="subject" required>
               <option value="">Select a subject…</option>
 

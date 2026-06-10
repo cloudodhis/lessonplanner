@@ -340,6 +340,30 @@ html, body {
   gap: 10px;
 }
 
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.field-group summary {
+  cursor: pointer;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  list-style: none;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.field-group summary::-webkit-details-marker { display: none; }
+.field-group summary::before { content: '▸ '; color: var(--accent); }
+.field-group[open] summary::before { content: '▾ '; }
+.field-group[open] summary { margin-bottom: 2px; }
+
 .field-row .field { flex: 1; min-width: 0; }
 
 .field {
