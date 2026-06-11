@@ -1,0 +1,10 @@
+# Ask the web server (LiteSpeed/Apache) not to run ModSecurity rules
+# against this app's API requests — some shared-hosting WAF rules
+# return 403 on JSON POST bodies. Ignored by hosts that disallow it.
+<IfModule mod_security.c>
+  SecFilterEngine Off
+  SecFilterScanPOST Off
+</IfModule>
+<IfModule security2_module>
+  SecRuleEngine Off
+</IfModule>
