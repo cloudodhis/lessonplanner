@@ -85,6 +85,36 @@
           <button class="btn-card">Create Assessment Plan <span>→</span></button>
         </div>
 
+        <!-- CBC Lesson Plan -->
+        <div class="card" data-type="cbc">
+          <div class="card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <h2>CBC Lesson Plan</h2>
+          <p class="card-desc">Kenyan CBC/KICD lesson plan with strands, competencies and values.</p>
+          <ul class="card-features">
+            <li>Strand, sub-strand &amp; key inquiry questions</li>
+            <li>Core competencies, values &amp; PCIs</li>
+            <li>Introduction → development → blank reflection</li>
+          </ul>
+          <button class="btn-card">Create CBC Lesson Plan <span>→</span></button>
+        </div>
+
+        <!-- Scheme of Work -->
+        <div class="card" data-type="scheme">
+          <div class="card-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          </div>
+          <h2>Scheme of Work</h2>
+          <p class="card-desc">Termly CBC/KICD scheme of work mapping strands to weekly lessons.</p>
+          <ul class="card-features">
+            <li>Weekly &amp; per-lesson breakdown</li>
+            <li>Learning experiences &amp; resources</li>
+            <li>Assessment methods &amp; reflection column</li>
+          </ul>
+          <button class="btn-card">Create Scheme of Work <span>→</span></button>
+        </div>
+
       </div>
     </section>
 
@@ -122,13 +152,13 @@
 
         <form id="lesson-form" novalidate>
 
-          <!-- Institution & Trainer details (TVET / CDACC document header) -->
+          <!-- Institution & Trainer details (document header) -->
           <details class="field-group" open>
-            <summary>Institution &amp; Trainer Details</summary>
+            <summary id="details-summary">Institution &amp; Trainer Details</summary>
 
             <div class="field-row">
               <div class="field">
-                <label for="institution">Institution</label>
+                <label for="institution" id="institution-label">Institution</label>
                 <input type="text" id="institution" name="institution" placeholder="e.g. Kisumu Technical Training Institute" />
               </div>
               <div class="field">
@@ -166,7 +196,7 @@
               </div>
             </div>
 
-            <div class="field-row">
+            <div class="field-row tvet-only">
               <div class="field">
                 <label for="unitCode">Unit Code</label>
                 <input type="text" id="unitCode" name="unitCode" placeholder="e.g. AURASA002" />
@@ -195,11 +225,11 @@
 
             <div class="field-row">
               <div class="field">
-                <label for="trainerName">Trainer Name</label>
+                <label for="trainerName" id="trainerName-label">Trainer Name</label>
                 <input type="text" id="trainerName" name="trainerName" placeholder="e.g. Austine" />
               </div>
               <div class="field">
-                <label for="trainerReg">Trainer Reg. No.</label>
+                <label for="trainerReg" id="trainerReg-label">Trainer Reg. No.</label>
                 <input type="text" id="trainerReg" name="trainerReg" placeholder="e.g. TR/2023/1234" />
               </div>
             </div>
@@ -211,7 +241,29 @@
               </div>
             </div>
 
-            <div class="field-row">
+            <div class="field-row cbc-only">
+              <div class="field">
+                <label for="strand">Strand</label>
+                <input type="text" id="strand" name="strand" placeholder="e.g. Gardening practices" />
+              </div>
+              <div class="field">
+                <label for="subStrand">Sub-strand</label>
+                <input type="text" id="subStrand" name="subStrand" placeholder="e.g. Indigenous food crops" />
+              </div>
+            </div>
+
+            <div class="field-row cbc-only">
+              <div class="field">
+                <label for="lessonDate">Lesson Date</label>
+                <input type="date" id="lessonDate" name="lessonDate" />
+              </div>
+              <div class="field">
+                <label for="lessonTime">Lesson Time</label>
+                <input type="text" id="lessonTime" name="lessonTime" placeholder="e.g. 8:00 – 8:35" />
+              </div>
+            </div>
+
+            <div class="field-row tvet-only">
               <div class="field">
                 <label for="theoryHours">Theory (hrs)</label>
                 <input type="number" id="theoryHours" name="theoryHours" placeholder="e.g. 2" min="0" step="0.5" />
@@ -229,7 +281,7 @@
 
           <!-- Subject dropdown -->
           <div class="field">
-            <label for="subject">Subject / Unit Title <span class="req">*</span></label>
+            <label for="subject" id="subject-label">Subject / Unit Title <span class="req">*</span></label>
             <select id="subject" name="subject" required>
               <option value="">Select a subject…</option>
 

@@ -14,8 +14,21 @@ const PLAN_TYPES = {
     badge: 'Assessment Plan',
     title: 'Create an Assessment Plan',
     subtitle: 'Formative and summative evaluation tools with marking guides.'
+  },
+  cbc: {
+    badge: 'CBC Lesson Plan',
+    title: 'Create a CBC Lesson Plan',
+    subtitle: 'A Kenyan CBC/KICD lesson plan with strands, competencies and values.'
+  },
+  scheme: {
+    badge: 'Scheme of Work',
+    title: 'Create a Scheme of Work',
+    subtitle: 'A termly CBC/KICD scheme of work mapping strands to weekly lessons.'
   }
 };
+
+// Plan types that use the Kenyan CBC / KICD document format
+const CBC_PLANS = ['cbc', 'scheme'];
 
 /* ── DOM refs ───────────────────────────────────────────────── */
 const pageHome      = document.getElementById('page-home');
@@ -400,11 +413,27 @@ function openWorkspace(type) {
   planBadge.textContent    = meta.badge;
   planTitle.textContent    = meta.title;
   planSubtitle.textContent = meta.subtitle;
+  applyCurriculumFields(CBC_PLANS.includes(activePlan));
   pageHome.classList.add('hidden');
   pageWorkspace.classList.remove('hidden');
   showOutput('empty');
   rawMarkdown = '';
   lessonOutput.innerHTML = '';
+}
+
+/* Swap field visibility and labels between TVET/CDACC and CBC/KICD modes */
+function applyCurriculumFields(isCbc) {
+  document.querySelectorAll('.tvet-only').forEach(el => el.classList.toggle('hidden', isCbc));
+  document.querySelectorAll('.cbc-only').forEach(el => el.classList.toggle('hidden', !isCbc));
+
+  const set = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+  set('details-summary',   isCbc ? 'School & Teacher Details' : 'Institution & Trainer Details');
+  set('institution-label', isCbc ? 'School' : 'Institution');
+  set('trainerName-label', isCbc ? 'Teacher Name' : 'Trainer Name');
+  set('trainerReg-label',  isCbc ? 'TSC / Assessment No.' : 'Trainer Reg. No.');
+
+  const subjLabel = document.getElementById('subject-label');
+  if (subjLabel) subjLabel.innerHTML = (isCbc ? 'Subject / Learning Area' : 'Subject / Unit Title') + ' <span class="req">*</span>';
 }
 
 backBtn.addEventListener('click', () => {
@@ -466,7 +495,11 @@ form.addEventListener('submit', async e => {
     venue:           form.venue.value.trim(),
     theoryHours:     form.theoryHours.value.trim(),
     practicalHours:  form.practicalHours.value.trim(),
-    attachmentHours: form.attachmentHours.value.trim()
+    attachmentHours: form.attachmentHours.value.trim(),
+    strand:          form.strand.value.trim(),
+    subStrand:       form.subStrand.value.trim(),
+    lessonDate:      form.lessonDate.value.trim(),
+    lessonTime:      form.lessonTime.value.trim()
   });
 });
 

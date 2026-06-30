@@ -194,6 +194,47 @@ async function streamGoogle(prompt, res, footer) {
 
 // ── Document header (deterministic, not AI-generated) ─────────
 function buildHeader(data) {
+  if (data.planType === 'cbc' || data.planType === 'scheme') return buildCbcHeader(data);
+  return buildTvetHeader(data);
+}
+
+// ── CBC / KICD header (Kenyan Competency-Based Curriculum) ────
+function buildCbcHeader(data) {
+  const { subject, gradeLevel, term, year, institution, trainerName, trainerReg,
+          studentCount, lessonDate, lessonTime, planType } = data;
+  const v = x => (x && String(x).trim()) ? String(x).trim() : '—';
+
+  const teacherLine = `**${v(trainerName)}**${trainerReg && String(trainerReg).trim() ? `  \nAssessment / TSC No. ${v(trainerReg)}` : ''}`;
+
+  if (planType === 'scheme') {
+    return `${teacherLine}
+
+# Scheme of Work
+
+| School | Learning Area | Grade | Term | Year |
+|---|---|---|---|---|
+| ${v(institution)} | ${v(subject)} | ${v(gradeLevel)} | ${v(term)} | ${v(year)} |
+
+---
+
+`;
+  }
+
+  return `${teacherLine}
+
+# Lesson Plan
+
+| Name of School | Grade | Term | Year | Learning Area | Date | Time | Roll |
+|---|---|---|---|---|---|---|---|
+| ${v(institution)} | ${v(gradeLevel)} | ${v(term)} | ${v(year)} | ${v(subject)} | ${v(lessonDate)} | ${v(lessonTime)} | ${v(studentCount)} |
+
+---
+
+`;
+}
+
+// ── TVET / CDACC header ───────────────────────────────────────
+function buildTvetHeader(data) {
   const {
     subject, gradeLevel, duration, institution, department, unitCode, knqfLevel,
     term, year, trainerName, trainerReg, venue, theoryHours, practicalHours, attachmentHours
@@ -220,9 +261,23 @@ function buildHeader(data) {
 `;
 }
 
-// ── Trainer verification footer (deterministic, not AI-generated) ──
+// ── Verification / sign-off footer (deterministic, not AI-generated) ──
 function buildFooter(data) {
-  const trainerName = (data.trainerName || '').trim();
+  const name = (data.trainerName || '').trim();
+
+  if (data.planType === 'cbc' || data.planType === 'scheme') {
+    const role = data.planType === 'scheme' ? 'Prepared By' : 'Teacher';
+    return `
+
+---
+
+## ${role}'s Sign-off
+
+| Name | Signature | Date |
+|---|---|---|
+| ${name || ' '} |  |  |
+`;
+  }
 
   return `
 
@@ -232,12 +287,128 @@ function buildFooter(data) {
 
 | Trainer Name | Signature | Date |
 |---|---|---|
-| ${trainerName || ' '} |  |  |
+| ${name || ' '} |  |  |
 `;
 }
 
 // ── Prompt builder ────────────────────────────────────────────
 function buildPrompt(data) {
+  if (data.planType === 'cbc')    return buildCbcLessonPrompt(data);
+  if (data.planType === 'scheme') return buildSchemePrompt(data);
+  return buildTvetPrompt(data);
+}
+
+// ── CBC / KICD lesson-plan prompt (Kenyan primary/junior school) ──
+function buildCbcLessonPrompt(data) {
+  const { subject, gradeLevel, duration, studentCount, objectives,
+          priorKnowledge, notes, strand, subStrand } = data;
+
+  const dur         = parseInt(duration) || 35;
+  const intro       = 5;
+  const conclusion  = 5;
+  const development  = Math.max(dur - intro - conclusion, 5);
+
+  return `You are an expert Kenyan teacher and a KICD-trained curriculum designer working with the Competency-Based Curriculum (CBC). Create a detailed, ready-to-use CBC/KICD lesson plan in Markdown, following the official KICD lesson-plan format.
+
+**Learning Area:** ${subject}
+**Grade:** ${gradeLevel}
+**Lesson Duration:** ${dur} minutes
+**Number of Learners (Roll):** ${studentCount || 'Not specified'}
+**Strand:** ${strand || '(infer an appropriate strand for this learning area and grade)'}
+**Sub-strand:** ${subStrand || '(infer an appropriate sub-strand)'}
+**Learning Objectives / Focus:** ${objectives}
+**Prior Knowledge:** ${priorKnowledge || 'Not specified'}
+**Notes:** ${notes || 'None'}
+
+---
+
+FORMATTING RULES (follow strictly):
+- Do NOT use emojis or decorative icons anywhere.
+- Use bold field labels followed by the content, exactly like the official KICD format (e.g. "**STRAND:** ...").
+- Keep the language clear, professional and classroom-ready.
+- Do NOT include a header table with school/grade/date details, and do NOT include a teacher signature section — those are generated separately and added automatically.
+- Leave the REFLECTION section BLANK for the teacher to complete after the lesson — write only the heading and a short italic instruction, never a pre-filled evaluation.
+
+Produce the lesson plan with EXACTLY these sections, in this order:
+
+**STRAND:** ${strand || '...'}
+
+**SUB-STRAND:** ${subStrand || '...'}
+
+**SPECIFIC LEARNING OUTCOMES:**
+By the end of the lesson, the learner should be able to:
+a) ... (knowledge)
+b) ... (skill)
+c) ... (attitude / value)
+Make them specific, measurable and observable.
+
+**KEY INQUIRY QUESTION(S):** one or two questions that drive the lesson.
+
+**CORE COMPETENCIES:** list the CBC core competencies developed (e.g. Communication and Collaboration, Critical Thinking and Problem Solving, Creativity and Imagination, Citizenship, Digital Literacy, Learning to Learn, Self-efficacy) and state briefly how each is developed in this lesson.
+
+**VALUES:** list the relevant CBC values nurtured (e.g. Responsibility, Respect, Unity, Integrity, Patriotism, Love, Peace) and how.
+
+**PERTINENT AND CONTEMPORARY ISSUES (PCIs):** the PCIs addressed (e.g. health, food security, environmental awareness, life skills, safety).
+
+**LEARNING RESOURCES:** realia, digital devices, charts and a Kenyan course book with a specific page reference.
+
+**ORGANISATION OF LEARNING:** the learning environment and grouping (e.g. indoor, group-work seating).
+
+**INTRODUCTION (${intro} min):** how the lesson is introduced, including the key inquiry question.
+
+**LESSON DEVELOPMENT (${development} min):** break into clear steps (Step 1, Step 2, Step 3 …) describing learner-centred activities; emphasise what the LEARNERS do.
+
+**CONCLUSION (${conclusion} min):** how the lesson is summarised and reinforced.
+
+**EXTENDED ACTIVITIES:** follow-up or research tasks for learners.
+
+**ASSESSMENT:** the assessment method(s) used to check the learning outcomes (e.g. observation, oral questions, written exercise, checklist or rubric).
+
+**REFLECTION:**
+_(To be completed by the teacher after the lesson.)_
+
+Make it immediately usable in a real Kenyan CBC classroom. Be specific and practical.`;
+}
+
+// ── CBC / KICD scheme-of-work prompt ──────────────────────────
+function buildSchemePrompt(data) {
+  const { subject, gradeLevel, term, objectives, priorKnowledge, notes, strand, subStrand } = data;
+
+  return `You are an expert Kenyan teacher and a KICD-trained curriculum designer working with the Competency-Based Curriculum (CBC). Create a detailed CBC/KICD Scheme of Work in Markdown, following the official KICD scheme-of-work format.
+
+**Learning Area:** ${subject}
+**Grade:** ${gradeLevel}
+**Term:** ${term || 'Term 1'}
+**Strand(s) / Focus:** ${strand || '(cover the strands appropriate for this learning area, grade and term)'}
+**Sub-strand(s):** ${subStrand || '(infer appropriate sub-strands)'}
+**Key Objectives / Focus:** ${objectives}
+**Prior Knowledge:** ${priorKnowledge || 'Not specified'}
+**Notes:** ${notes || 'None'}
+
+---
+
+FORMATTING RULES (follow strictly):
+- Do NOT use emojis or decorative icons anywhere.
+- Present the scheme as ONE Markdown table using the official KICD columns shown below.
+- Cover a full school term: produce rows for about 9 to 13 teaching weeks, with the appropriate number of lessons per week for this learning area and grade.
+- Number weeks sequentially (Week 1, 2, 3 …) and number the lessons within each week.
+- Make the learning outcomes specific and measurable, and align resources to Kenyan course books with page references where possible.
+- Leave the Reflection column BLANK for the teacher to complete after delivery.
+- Do NOT include a header table with school/grade details and do NOT include a signature section — those are added automatically.
+
+## Scheme of Work
+
+Produce the table with EXACTLY these columns:
+
+| Week | Lesson | Strand | Sub-strand | Specific Learning Outcomes | Key Inquiry Question(s) | Learning Experiences | Learning Resources | Assessment Methods | Reflection |
+|------|--------|--------|------------|----------------------------|--------------------------|----------------------|--------------------|--------------------|------------|
+| 1 | 1 | ... | ... | ... | ... | ... | ... | ... | |
+
+Continue the table to cover the whole term. Be specific, practical and aligned to the Kenyan CBC design.`;
+}
+
+// ── TVET / CDACC prompt ───────────────────────────────────────
+function buildTvetPrompt(data) {
   const { planType, subject, gradeLevel, duration, studentCount,
           objectives, priorKnowledge, teachingStyle, notes } = data;
 
